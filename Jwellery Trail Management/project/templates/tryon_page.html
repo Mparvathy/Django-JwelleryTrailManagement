@@ -1,0 +1,538 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Raleway:wght@300;400;500;600&display=swap');
+
+  :root {
+    --gold:      #8B5E3C;
+    --gold-dark: #6B4226;
+    --ivory:     #faf6f0;
+    --cream:     #f5ece4;
+    --white:     #ffffff;
+    --text:      #2c2416;
+    --muted:     #7a6e60;
+    --border:    rgba(139,94,60,0.22);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .tryon-wrap {
+    min-height: 100vh;
+    background: var(--ivory);
+    padding: 40px 20px 80px;
+  }
+
+  /* Header */
+  .tryon-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .tryon-header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(20px, 4vw, 32px);
+    font-weight: 400;
+    color: var(--text);
+    letter-spacing: 4px;
+    margin-bottom: 8px;
+  }
+  .tryon-header h1 span { color: var(--gold); }
+  .tryon-header p {
+    font-family: 'Raleway', sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  /* Main layout */
+  .tryon-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 28px;
+    max-width: 1100px;
+    margin: 0 auto;
+    align-items: start;
+  }
+
+  /* Video feed */
+  .video-card {
+    background: #0f0e0b;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .video-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    z-index: 2;
+  }
+
+  #stream-img {
+    width: 100%;
+    display: block;
+    min-height: 360px;
+    object-fit: cover;
+    background: #000;
+  }
+
+  /* Loading overlay */
+  .stream-loading {
+    position: absolute;
+    inset: 0;
+    background: #0f0e0b;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    z-index: 3;
+  }
+  .stream-loading p {
+    font-family: 'Raleway', sans-serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(201,168,76,0.6);
+  }
+  .spinner {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: var(--gold);
+    border-bottom-color: var(--gold);
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Controls */
+  .video-controls {
+    padding: 16px 20px;
+    border-top: 1px solid rgba(201,168,76,0.1);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .size-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+  .size-wrap label {
+    font-family: 'Raleway', sans-serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(201,168,76,0.6);
+    white-space: nowrap;
+  }
+  .size-slider {
+    flex: 1;
+    accent-color: var(--gold);
+    cursor: pointer;
+  }
+  .size-val {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    color: var(--gold);
+    min-width: 28px;
+  }
+
+  .btn-snap {
+    padding: 9px 20px;
+    background: #f5ece4;
+    color: #8B5E3C;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    border: 1px solid #8B5E3C;
+    cursor: pointer;
+    transition: background 0.25s;
+    white-space: nowrap;
+  }
+  .btn-snap:hover { background: #8B5E3C; color: white; }
+
+  .stream-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 1px;
+    margin-left: auto;
+  }
+  .live-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #4caf50;
+    animation: livePulse 1.5s ease-in-out infinite;
+  }
+  @keyframes livePulse {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.3; }
+  }
+
+  /* Side panel */
+  .side-panel { display: flex; flex-direction: column; gap: 20px; }
+
+  .product-card-info {
+    background: var(--white);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .product-card-info::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .prod-img-wrap {
+    aspect-ratio: 1/1;
+    overflow: hidden;
+    background: var(--cream);
+  }
+  .prod-img-wrap img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+
+  .prod-info { padding: 18px 20px; }
+  .prod-cat {
+    font-family: 'Raleway', sans-serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold-dark);
+    margin-bottom: 6px;
+  }
+  .prod-name {
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--text);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+  .prod-price {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    color: var(--gold-dark);
+    font-weight: 600;
+  }
+
+  /* Type badge */
+  .type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 5px 12px;
+    background: rgba(201,168,76,0.08);
+    border: 1px solid var(--border);
+    font-family: 'Raleway', sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold-dark);
+  }
+
+  /* Tips card */
+  .tips-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    padding: 20px;
+  }
+  .tips-card h4 {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 2px;
+    margin-bottom: 14px;
+  }
+  .tips-card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .tips-card li {
+    font-family: 'Raleway', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.5;
+  }
+  .tips-card li::before {
+    content: '✦';
+    color: var(--gold);
+    font-size: 10px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  /* Back button */
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 22px;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Raleway', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    text-decoration: none;
+    transition: all 0.25s;
+    width: 100%;
+    justify-content: center;
+  }
+  .btn-back:hover { border-color: var(--gold); color: var(--gold-dark); }
+
+  .btn-start {
+    padding: 12px 32px;
+    background: #8B5E3C;
+    color: white;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: background 0.25s;
+  }
+  .btn-start:hover { background: #6B4226; }
+
+  /* Snapshot canvas (hidden) */
+  #snap-canvas { display: none; }
+
+  @media (max-width: 768px) {
+    .tryon-layout { grid-template-columns: 1fr; }
+    .side-panel { order: -1; }
+    .prod-img-wrap { aspect-ratio: 2/1; }
+  }
+</style>
+
+<div class="tryon-wrap">
+
+  <!-- Header -->
+  <div class="tryon-header">
+    <h1>Virtual <span>Try-On</span></h1>
+    <p>{{ product.name }} — Live Camera with AI Tracking</p>
+  </div>
+
+  <div class="tryon-layout">
+
+    <!-- Video Feed -->
+    <div class="video-card">
+      <div class="stream-loading" id="stream-loading">
+        <div class="spinner"></div>
+        <p id="loading-text">Click Start to open camera</p>
+        <button class="btn-start" id="btn-start" onclick="startStream(currentSize)">
+          ▶ &nbsp;Start Camera
+        </button>
+      </div>
+
+      <img id="stream-img"
+           src=""
+           alt="Live Try-On"
+           style="display:none;"
+           onerror="onStreamError()"/>
+
+      <div class="video-controls">
+        <div class="size-wrap">
+          <label>Size</label>
+          <input type="range" class="size-slider" id="size-slider"
+            min="0.4" max="2.5" step="0.05" value="1.0"
+            oninput="updateSize(this.value)"/>
+          <span class="size-val" id="size-val">1.0×</span>
+        </div>
+        <button class="btn-snap" onclick="takeSnapshot()">📸 Snapshot</button>
+        <button class="btn-snap" onclick="stopStream()" style="background:#8B0000;">⏹ Stop</button>
+        <div class="stream-badge">
+          <div class="live-dot" id="live-dot" style="background:#888;"></div>
+          <span id="live-label">Offline</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Side Panel -->
+    <div class="side-panel">
+
+      <!-- Product Info -->
+      <div class="product-card-info">
+        <div class="prod-img-wrap">
+          {% if product.image %}
+          <img src="{{ product.image.url }}" alt="{{ product.name }}"/>
+          {% endif %}
+        </div>
+        <div class="prod-info">
+          <div class="prod-cat">{{ product.category.name }}</div>
+          <div class="prod-name">{{ product.name }}</div>
+          <div class="prod-price">₹{{ product.price }}</div>
+          <div class="type-badge">
+            {% if jewelry_type == 'earring' %}
+              👂 Earring Mode
+            {% else %}
+              ✦ Necklace Mode
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Tips -->
+      <div class="tips-card">
+        <h4>Try-On Tips</h4>
+        <ul>
+          {% if jewelry_type == 'earring' %}
+          <li>Face the camera directly for best earring detection</li>
+          <li>Keep your face well lit and hair behind ears</li>
+          <li>Move closer to camera for better accuracy</li>
+          {% else %}
+          <li>Stand back so your full shoulders are visible</li>
+          <li>Face the camera straight for accurate placement</li>
+          <li>Good lighting improves detection accuracy</li>
+          {% endif %}
+          <li>Use the size slider to adjust jewelry size</li>
+          <li>Press Snapshot to save your look</li>
+        </ul>
+      </div>
+
+      <!-- Back -->
+      <a href="{% url 'tryon' %}" class="btn-back" onclick="stopStream()">
+        ← Back to Collections
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<canvas id="snap-canvas"></canvas>
+
+<script>
+  const productId   = "{{ product.pk }}";
+  const streamBase  = "/tryon/stream/" + productId + "/";
+  const stopUrl     = "/tryon/stop/";
+  let   currentSize = 1.0;
+  let   isStreaming = false;
+
+  // ── Start stream ──────────────────────────────────────────
+  function startStream(size) {
+    if (isStreaming) stopStream();
+
+    const img     = document.getElementById('stream-img');
+    const loading = document.getElementById('stream-loading');
+    const btn     = document.getElementById('btn-start');
+
+    document.getElementById('loading-text').textContent = 'Starting Camera...';
+    if (btn) btn.style.display = 'none';
+    loading.style.display = 'flex';
+    img.style.display     = 'none';
+    isStreaming = true;
+
+    // ✅ Set src AFTER attaching handlers
+    img.onload = function() {
+        loading.style.display = 'none';
+        img.style.display     = 'block';
+        document.getElementById('live-dot').style.background = '#4caf50';
+        document.getElementById('live-label').textContent    = 'Live';
+    };
+
+    img.onerror = function() {
+        onStreamError();
+    };
+
+    // ✅ Timestamp prevents browser caching
+    img.src = streamBase + '?size=' + size + '&t=' + Date.now();
+}
+
+
+  // ── Stop stream ───────────────────────────────────────────
+  function stopStream() {
+    isStreaming = false;
+    const img = document.getElementById('stream-img');
+    img.src   = '';
+    img.style.display = 'none';
+    document.getElementById('live-dot').style.background  = '#888';
+    document.getElementById('live-label').textContent     = 'Offline';
+
+    // Reset loading panel
+    const loading = document.getElementById('stream-loading');
+    loading.style.display = 'flex';
+    document.getElementById('loading-text').textContent = 'Camera stopped';
+    const btn = document.getElementById('btn-start');
+    if (btn) btn.style.display = 'inline-block';
+
+    return fetch(stopUrl).catch(() => {});
+  }
+
+  function onStreamError() {
+    document.getElementById('loading-text').textContent = '⚠ Camera error — check console';
+    document.getElementById('stream-loading').style.display = 'flex';
+    document.getElementById('stream-img').style.display = 'none';
+    isStreaming = false;
+    const btn = document.getElementById('btn-start');
+    if (btn) btn.style.display = 'inline-block';
+  }
+
+  // ── Size slider ───────────────────────────────────────────
+  let sizeTimer = null;
+  function updateSize(val) {
+    currentSize = parseFloat(val).toFixed(2);
+    document.getElementById('size-val').textContent = currentSize + '×';
+    clearTimeout(sizeTimer);
+    sizeTimer = setTimeout(() => {
+      if (isStreaming) {
+        stopStream().then(() => {
+          setTimeout(() => startStream(currentSize), 300);
+        });
+      }
+    }, 700);
+  }
+
+  // ── Snapshot ──────────────────────────────────────────────
+  function takeSnapshot() {
+    const img    = document.getElementById('stream-img');
+    const canvas = document.getElementById('snap-canvas');
+    if (!img.src || img.style.display === 'none') {
+      alert('Start the camera first!');
+      return;
+    }
+    canvas.width  = img.naturalWidth  || img.clientWidth  || 640;
+    canvas.height = img.naturalHeight || img.clientHeight || 480;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    const link    = document.createElement('a');
+    link.download = 'tanishq-tryon-' + productId + '.png';
+    link.href     = canvas.toDataURL('image/png');
+    link.click();
+  }
+
+  // Stop stream when leaving page
+  window.addEventListener('beforeunload', () => {
+    fetch(stopUrl).catch(() => {});
+  });
+</script>
+
+{% endblock %}

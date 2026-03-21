@@ -1,0 +1,613 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=Raleway:wght@300;400;500&display=swap');
+
+  :root {
+    --gold: #B8860B;
+    --gold-light: #C9A84C;
+    --gold-pale: #E8CC7A;
+    --black: #2c2416;
+    --deep: #faf6f0;
+    --charcoal: #ffffff;
+    --ivory: #fdf9f3;
+    --muted: #6b5d4f;
+    --text-dark: #2c2416;
+    --bg-main: #faf6f0;
+    --bg-alt: #f2ebe0;
+    --bg-card: #ffffff;
+    --border: rgba(184,134,11,0.2);
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* ── HERO ───────────────────────────────────────────────── */
+  .ts-hero {
+    position: relative;
+    height: 100vh;
+    min-height: 600px;
+    background: url("../images/jewelry-banner.jpg") center/cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .ts-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      160deg,
+      rgba(0,0,0,0.85) 0%,
+      rgba(10,8,4,0.65) 50%,
+      rgba(0,0,0,0.9) 100%
+    );
+  }
+
+  /* Animated gold corner ornaments */
+  .ts-hero::after {
+    content: '';
+    position: absolute;
+    inset: 30px;
+    border: 1px solid rgba(201,168,76,0.25);
+    pointer-events: none;
+    animation: borderFade 3s ease forwards;
+  }
+
+  @keyframes borderFade {
+    from { opacity: 0; inset: 60px; }
+    to   { opacity: 1; inset: 30px; }
+  }
+
+  .ts-hero-inner {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 40px;
+    animation: heroReveal 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  @keyframes heroReveal {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .ts-hero-eyebrow {
+    font-family: 'Raleway', sans-serif;
+    font-size: 11px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 24px;
+  }
+
+  .ts-hero h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(48px, 8vw, 96px);
+    font-weight: 400;
+    color: var(--ivory);
+    letter-spacing: 8px;
+    line-height: 1;
+    margin-bottom: 28px;
+  }
+
+  .ts-hero h1 span {
+    color: var(--gold);
+  }
+
+  .ts-hero-line {
+    width: 80px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 0 auto 24px;
+  }
+
+  .ts-hero p {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(18px, 2.5vw, 26px);
+    color: rgba(245,240,232,0.75);
+    letter-spacing: 1px;
+  }
+
+  /* ── STORY ──────────────────────────────────────────────── */
+  .ts-story {
+    background: var(--bg-main);
+    padding: 120px 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: center;
+  }
+
+  .ts-story-label {
+    font-family: 'Raleway', sans-serif;
+    font-size: 10px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 30px;
+  }
+
+  .ts-story-label::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .ts-story h2 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 400;
+    color: var(--text-dark);
+    line-height: 1.15;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+  }
+
+  .ts-story p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    line-height: 1.9;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .ts-story-visual {
+    position: relative;
+  }
+
+  .ts-story-visual-inner {
+    aspect-ratio: 3/4;
+    position: relative;
+    overflow: hidden;
+    border-radius: 2px;
+  }
+
+  .ts-story-visual-inner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    filter: brightness(0.92) saturate(1.05);
+    transition: transform 0.6s ease;
+  }
+
+  .ts-story-visual-inner:hover img {
+    transform: scale(1.04);
+  }
+
+  /* Subtle gold overlay tint */
+  .ts-story-visual-inner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(201,168,76,0.04) 0%,
+      rgba(0,0,0,0.25) 100%
+    );
+    pointer-events: none;
+  }
+
+  /* Gold frame accent */
+  .ts-story-visual-frame {
+    position: absolute;
+    inset: -12px;
+    border: 1px solid rgba(201,168,76,0.3);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .ts-story-accent {
+    position: absolute;
+    bottom: -20px;
+    right: -20px;
+    width: 100px;
+    height: 100px;
+    border: 2px solid var(--gold);
+    opacity: 0.35;
+    z-index: 2;
+  }
+
+  .ts-story-accent-tl {
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    width: 60px;
+    height: 60px;
+    border-top: 2px solid var(--gold);
+    border-left: 2px solid var(--gold);
+    opacity: 0.5;
+    z-index: 2;
+  }
+
+  /* ── PILLARS ────────────────────────────────────────────── */
+  .ts-pillars {
+    background: var(--bg-alt);
+    padding: 100px 40px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ts-pillars-header {
+    text-align: center;
+    margin-bottom: 70px;
+  }
+
+  .ts-pillars-header span {
+    font-family: 'Raleway', sans-serif;
+    font-size: 10px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .ts-pillars-header h2 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 400;
+    color: var(--text-dark);
+    letter-spacing: 3px;
+    margin-top: 16px;
+  }
+
+  .ts-pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .ts-pillar {
+    background: var(--bg-card);
+    padding: 50px 45px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.4s;
+    box-shadow: 0 2px 20px rgba(184,134,11,0.06);
+  }
+
+  .ts-pillar:hover {
+    background: #fffdf7;
+  }
+
+  .ts-pillar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 0;
+    background: var(--gold);
+    transition: height 0.4s ease;
+  }
+
+  .ts-pillar:hover::before {
+    height: 100%;
+  }
+
+  .ts-pillar-num {
+    font-family: 'Cinzel', serif;
+    font-size: 48px;
+    font-weight: 600;
+    color: rgba(184,134,11,0.15);
+    line-height: 1;
+    margin-bottom: 20px;
+    transition: color 0.4s;
+  }
+
+  .ts-pillar:hover .ts-pillar-num {
+    color: rgba(184,134,11,0.3);
+  }
+
+  .ts-pillar h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .ts-pillar p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--muted);
+  }
+
+  /* ── MISSION / VISION ───────────────────────────────────── */
+  .ts-mv {
+    background: var(--bg-main);
+    padding: 120px 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-width: 1100px;
+    margin: 0 auto;
+    gap: 1px;
+    border: 1px solid var(--border);
+  }
+
+  .ts-mv-card {
+    padding: 70px 60px;
+    position: relative;
+    background: var(--bg-card);
+  }
+
+  .ts-mv-card:first-child {
+    border-right: 1px solid var(--border);
+  }
+
+  .ts-mv-card::before {
+    content: attr(data-label);
+    font-family: 'Raleway', sans-serif;
+    font-size: 10px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: block;
+    margin-bottom: 30px;
+  }
+
+  .ts-mv-card h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 32px;
+    font-weight: 400;
+    color: var(--text-dark);
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+    line-height: 1.3;
+  }
+
+  .ts-mv-card p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    line-height: 1.9;
+    color: var(--muted);
+  }
+
+  .ts-mv-deco {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    font-size: 60px;
+    color: rgba(184,134,11,0.08);
+    font-family: 'Cinzel', serif;
+    line-height: 1;
+  }
+
+  /* ── CLOSING ────────────────────────────────────────────── */
+  .ts-closing {
+    background: linear-gradient(135deg, #f5edda 0%, #ede0c4 50%, #f5edda 100%);
+    padding: 130px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ts-closing::before {
+    content: 'TANISHQ';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Cinzel', serif;
+    font-size: clamp(60px, 12vw, 160px);
+    letter-spacing: 20px;
+    color: rgba(184,134,11,0.06);
+    white-space: nowrap;
+  }
+
+  .ts-closing-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .ts-closing-ornament {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    color: var(--gold);
+    letter-spacing: 10px;
+    margin-bottom: 30px;
+    opacity: 0.7;
+  }
+
+  .ts-closing h2 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(28px, 4vw, 52px);
+    font-weight: 400;
+    color: var(--text-dark);
+    letter-spacing: 4px;
+    line-height: 1.2;
+    margin-bottom: 30px;
+  }
+
+  .ts-closing h2 em {
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15em;
+    color: var(--gold);
+  }
+
+  .ts-closing-line {
+    width: 80px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 30px auto;
+  }
+
+  .ts-closing p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    line-height: 1.9;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* ── RESPONSIVE ─────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .ts-story {
+      grid-template-columns: 1fr;
+      gap: 50px;
+      padding: 80px 24px;
+    }
+
+    .ts-story-visual {
+      display: none;
+    }
+
+    .ts-pillars-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .ts-mv {
+      grid-template-columns: 1fr;
+    }
+
+    .ts-mv-card:first-child {
+      border-right: none;
+      border-bottom: 1px solid rgba(201,168,76,0.12);
+    }
+
+    .ts-mv-card {
+      padding: 50px 30px;
+    }
+
+    .ts-pillar {
+      padding: 40px 30px;
+    }
+  }
+</style>
+
+<!-- HERO -->
+<section class="ts-hero">
+  <div class="ts-hero-inner">
+    <p class="ts-hero-eyebrow">Est. Since the Beginning of Elegance</p>
+    <h1>TAN<span>ISH</span>Q</h1>
+    <div class="ts-hero-line"></div>
+    <p>Where craftsmanship meets the art of becoming.</p>
+  </div>
+</section>
+
+<!-- OUR STORY -->
+<section style="background: #faf6f0;">
+  <div class="ts-story">
+    <div class="ts-story-text">
+      <div class="ts-story-label">Our Story</div>
+      <h2>Born from a Passion for Timeless Beauty</h2>
+      <p>
+        Tanishq was founded on the belief that jewelry is not merely adornment —
+        it is memory, identity, and emotion rendered in gold and stone.
+        Every piece in our collection carries the weight of intention and the grace of artistry.
+      </p>
+      <p>
+        Through our virtual try-on technology, we brought the intimacy of a jeweler's
+        atelier into your home — letting you feel the jewel before you hold it.
+        This is not shopping. This is discovery.
+      </p>
+    </div>
+    <div class="ts-story-visual">
+      <div class="ts-story-visual-frame"></div>
+      <div class="ts-story-accent-tl"></div>
+      <div class="ts-story-visual-inner">
+        <img
+          src="https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=700&q=80"
+          alt="Mixed jewelry collection"
+          loading="lazy"
+        />
+      </div>
+      <div class="ts-story-accent"></div>
+    </div>
+  </div>
+</section>
+
+<!-- MISSION & VISION -->
+<section style="background: #faf6f0; padding: 0 40px 120px;">
+  <div class="ts-mv">
+    <div class="ts-mv-card" data-label="Our Mission">
+      <h3>To Illuminate Every Woman's Inner Light</h3>
+      <p>
+        We exist to make the experience of discovering jewelry as beautiful
+        as the jewelry itself — through technology, craft, and a deep respect
+        for the stories our customers carry.
+      </p>
+      <div class="ts-mv-deco">✦</div>
+    </div>
+    <div class="ts-mv-card" data-label="Our Vision">
+      <h3>A World Where Beauty Has No Boundaries</h3>
+      <p>
+        Tanishq envisions a future where every person, anywhere in the world,
+        can explore and wear jewelry that speaks to who they truly are —
+        unconfined by geography or occasion.
+      </p>
+      <div class="ts-mv-deco">◈</div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY CHOOSE US -->
+<section class="ts-pillars">
+  <div class="ts-pillars-header">
+    <span>The Tanishq Difference</span>
+    <h2>Four Pillars of Excellence</h2>
+  </div>
+  <div class="ts-pillars-grid">
+    <div class="ts-pillar">
+      <div class="ts-pillar-num">01</div>
+      <h3>Virtual Try-On</h3>
+      <p>See how each piece adorns you before it arrives. Our real-time technology brings the mirror to you.</p>
+    </div>
+    <div class="ts-pillar">
+      <div class="ts-pillar-num">02</div>
+      <h3>Curated Designs</h3>
+      <p>Every collection is thoughtfully assembled — balancing heritage aesthetics with modern sensibility.</p>
+    </div>
+    <div class="ts-pillar">
+      <div class="ts-pillar-num">03</div>
+      <h3>Effortless Journey</h3>
+      <p>Refined navigation and an intuitive interface ensure discovering your perfect piece is pure pleasure.</p>
+    </div>
+    <div class="ts-pillar">
+      <div class="ts-pillar-num">04</div>
+      <h3>Trusted Security</h3>
+      <p>Your trust is sacred to us. Our platform is built on robust, reliable security at every step.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CLOSING -->
+<section class="ts-closing">
+  <div class="ts-closing-inner">
+    <div class="ts-closing-ornament">— ✦ —</div>
+    <h2>Discover the Jewel That<br><em>Was Always Yours</em></h2>
+    <div class="ts-closing-line"></div>
+    <p>
+      Jewelry is the language of the soul — quiet, radiant, eternal.
+      At Tanishq, we help you find the words that have always been yours to wear.
+    </p>
+  </div>
+</section>
+
+{% endblock %}

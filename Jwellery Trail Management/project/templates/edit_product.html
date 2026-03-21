@@ -1,0 +1,247 @@
+{% extends 'base1.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Raleway:wght@300;400;500;600&display=swap');
+
+  :root {
+    --gold:      #C9A84C;
+    --gold-dark: #B8860B;
+    --gold-light:#E8CC7A;
+    --ivory:     #faf6f0;
+    --cream:     #f2ebe0;
+    --white:     #ffffff;
+    --text:      #2c2416;
+    --muted:     #7a6e60;
+    --border:    rgba(201,168,76,0.22);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .edit-page {
+    min-height: 100vh; background: var(--ivory);
+    display: flex; align-items: flex-start;
+    justify-content: center; padding: 60px 20px 80px;
+  }
+
+  .edit-card {
+    background: var(--white); border: 1px solid var(--border);
+    width: 100%; max-width: 640px;
+    box-shadow: 0 10px 40px rgba(184,134,11,0.08);
+    position: relative;
+    animation: cardIn 0.5s cubic-bezier(0.22,1,0.36,1) forwards;
+    opacity: 0; transform: translateY(16px);
+  }
+  @keyframes cardIn { to { opacity:1; transform:translateY(0); } }
+  .edit-card::before {
+    content: ''; position: absolute; top:0; left:0; right:0;
+    height: 3px; background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .edit-card-header {
+    padding: 30px 36px 22px; border-bottom: 1px solid var(--border); text-align: center;
+  }
+  .edit-gem { font-size: 26px; color: var(--gold); display: block; margin-bottom: 10px; }
+  .edit-card-header h2 {
+    font-family: 'Cinzel', serif; font-size: 20px; font-weight: 600;
+    color: var(--text); letter-spacing: 4px; margin-bottom: 6px;
+  }
+  .edit-card-header h2 span { color: var(--gold); }
+  .edit-card-header p { font-family: 'Raleway', sans-serif; font-size: 12px; color: var(--muted); letter-spacing: 1px; }
+
+  .edit-card-body { padding: 32px 36px 36px; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+  .form-grid .form-group.full { grid-column: 1 / -1; }
+  .form-group { margin-bottom: 22px; }
+
+  .form-label {
+    font-family: 'Raleway', sans-serif; font-size: 10px; font-weight: 600;
+    letter-spacing: 4px; text-transform: uppercase; color: var(--gold-dark);
+    display: block; margin-bottom: 10px;
+  }
+  .form-label span { color: #e05555; margin-left: 2px; }
+
+  .form-input {
+    width: 100%; padding: 12px 14px;
+    font-family: 'Raleway', sans-serif; font-size: 14px; color: var(--text);
+    background: var(--ivory); border: 1px solid var(--border); outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+  }
+  .form-input:focus { border-color: var(--gold); background: var(--white); box-shadow: 0 0 0 3px rgba(201,168,76,0.08); }
+  select.form-input { cursor: pointer; }
+  textarea.form-input { resize: vertical; min-height: 100px; line-height: 1.7; }
+
+  /* Current image preview */
+  .current-image { margin-bottom: 14px; }
+  .current-image img {
+    max-height: 100px; max-width: 160px; border: 1px solid var(--border);
+    object-fit: cover; display: block; margin-bottom: 8px;
+  }
+  .current-image span {
+    font-family: 'Raleway', sans-serif; font-size: 11px; color: var(--muted); letter-spacing: 0.5px;
+  }
+
+  /* Image upload */
+  .image-upload-wrap {
+    border: 2px dashed var(--border); background: var(--ivory);
+    padding: 20px; text-align: center; cursor: pointer;
+    transition: border-color 0.25s; position: relative;
+  }
+  .image-upload-wrap:hover { border-color: var(--gold); }
+  .image-upload-wrap input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .upload-text { font-family: 'Raleway', sans-serif; font-size: 12px; color: var(--muted); }
+  .upload-text span { color: var(--gold-dark); font-weight: 600; }
+
+  /* Toggle */
+  .toggle-wrap { display: flex; align-items: center; gap: 12px; padding: 12px 0; }
+  .toggle-label { font-family: 'Raleway', sans-serif; font-size: 13px; color: var(--text); }
+  .toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; inset: 0; background: #ddd;
+    border-radius: 24px; cursor: pointer; transition: background 0.3s;
+  }
+  .toggle-slider::before {
+    content: ''; position: absolute; width: 18px; height: 18px;
+    left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: transform 0.3s;
+  }
+  .toggle-switch input:checked + .toggle-slider { background: var(--gold); }
+  .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+  /* Buttons */
+  .form-actions { display: flex; gap: 12px; margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--border); }
+
+  .btn-submit {
+    flex: 1; padding: 14px; background: var(--text); color: var(--gold);
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600;
+    letter-spacing: 4px; text-transform: uppercase;
+    border: 1px solid var(--text); cursor: pointer;
+    position: relative; overflow: hidden; transition: background 0.3s, color 0.3s;
+  }
+  .btn-submit::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.18), transparent);
+    transform: translateX(-100%); transition: transform 0.5s ease;
+  }
+  .btn-submit:hover::before { transform: translateX(100%); }
+  .btn-submit:hover { background: var(--gold-dark); border-color: var(--gold-dark); color: white; }
+
+  .btn-back {
+    padding: 14px 22px; background: transparent; color: var(--muted);
+    font-family: 'Raleway', sans-serif; font-size: 12px; font-weight: 500;
+    letter-spacing: 2px; text-transform: uppercase;
+    border: 1px solid var(--border); cursor: pointer;
+    text-decoration: none; display: inline-flex; align-items: center;
+    transition: all 0.25s;
+  }
+  .btn-back:hover { border-color: var(--gold); color: var(--gold-dark); }
+
+  @media (max-width: 560px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .edit-card-body { padding: 24px 20px; }
+  }
+</style>
+
+<div class="edit-page">
+  <div class="edit-card">
+
+    <div class="edit-card-header">
+      <span class="edit-gem">◈</span>
+      <h2>Edit <span>Product</span></h2>
+      <p>Update — {{ product.name }}</p>
+    </div>
+
+    <div class="edit-card-body">
+      <form method="POST" enctype="multipart/form-data"
+            action="{% url 'admin_edit_product' pk=product.pk %}">
+        {% csrf_token %}
+
+        <div class="form-grid">
+
+          <!-- Name -->
+          <div class="form-group full">
+            <label class="form-label">Product Name <span>*</span></label>
+            <input type="text" name="name" class="form-input"
+              value="{{ product.name }}" maxlength="200" required/>
+          </div>
+
+          <!-- Category -->
+          <div class="form-group">
+            <label class="form-label">Category <span>*</span></label>
+            <select name="category" class="form-input" required>
+              {% for cat in categories %}
+              <option value="{{ cat.pk }}" {% if cat.pk == product.category.pk %}selected{% endif %}>
+                {{ cat.name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Price -->
+          <div class="form-group">
+            <label class="form-label">Price (₹) <span>*</span></label>
+            <input type="number" name="price" class="form-input"
+              value="{{ product.price }}" min="0" step="0.01" required/>
+          </div>
+
+          <!-- Stock -->
+          <div class="form-group">
+            <label class="form-label">Stock</label>
+            <input type="number" name="stock" class="form-input"
+              value="{{ product.stock }}" min="0"/>
+          </div>
+
+          <!-- Status -->
+          <div class="form-group" style="display:flex; align-items:center;">
+            <div>
+              <label class="form-label">Status</label>
+              <div class="toggle-wrap">
+                <label class="toggle-switch">
+                  <input type="checkbox" name="is_active" {% if product.is_active %}checked{% endif %}/>
+                  <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-label">Active</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group full">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-input">{{ product.description|default:'' }}</textarea>
+          </div>
+
+          <!-- Image -->
+          <div class="form-group full">
+            <label class="form-label">Product Image</label>
+            {% if product.image %}
+            <div class="current-image">
+              <img src="{{ product.image.url }}" alt="{{ product.name }}"/>
+              <span>Current image — upload new to replace</span>
+            </div>
+            {% endif %}
+            <div class="image-upload-wrap">
+              <input type="file" name="image" accept="image/*"/>
+              <div class="upload-text">
+                <span>Click to upload</span> new image (optional)
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-submit">✦ &nbsp;Update Product</button>
+          <a href="{% url 'admin_manage_products' %}" class="btn-back">← Back</a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

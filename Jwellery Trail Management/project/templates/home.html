@@ -1,0 +1,1074 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Didact+Gothic&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400&family=Jost:wght@200;300;400;500&display=swap');
+
+  :root {
+    --gold:       #B8922A;
+    --gold-light: #D4AA50;
+    --gold-pale:  #F0E0B0;
+    --ivory:      #FDFAF5;
+    --cream:      #F5EFE3;
+    --sand:       #EDE3D0;
+    --text:       #1A1410;
+    --text-mid:   #4A3F32;
+    --text-soft:  #8A7A68;
+    --border:     rgba(184,146,42,0.15);
+    --white:      #FFFFFF;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body { background: var(--ivory); }
+
+  /* ── HERO ─────────────────────────────────────────────────── */
+  .hero {
+    position: relative;
+    min-height: 95vh;
+    background: var(--ivory);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: hidden;
+  }
+
+  /* Left text panel */
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 60px 80px 8vw;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Subtle watermark text */
+  .hero-left::before {
+    content: 'TANISHQ';
+    position: absolute;
+    bottom: -20px;
+    left: -20px;
+    font-family: 'Bodoni Moda', serif;
+    font-size: 180px;
+    font-weight: 700;
+    color: rgba(184,146,42,0.04);
+    letter-spacing: 10px;
+    white-space: nowrap;
+    pointer-events: none;
+    line-height: 1;
+  }
+
+  .hero-season {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: slideRight 0.7s ease 0.1s forwards;
+  }
+  .hero-season-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+  .hero-season-text {
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .hero-title {
+    font-family: 'Bodoni Moda', serif;
+    font-size: clamp(44px, 5.5vw, 80px);
+    font-weight: 400;
+    line-height: 1.05;
+    color: var(--text);
+    margin-bottom: 6px;
+    opacity: 0;
+    animation: slideRight 0.8s ease 0.25s forwards;
+  }
+  .hero-title-italic {
+    font-family: 'Bodoni Moda', serif;
+    font-style: italic;
+    font-size: clamp(40px, 5vw, 74px);
+    font-weight: 400;
+    color: var(--gold);
+    line-height: 1.1;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: slideRight 0.8s ease 0.4s forwards;
+  }
+
+  .hero-divider {
+    width: 56px;
+    height: 1px;
+    background: var(--gold);
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: expandWidth 0.8s ease 0.55s forwards;
+  }
+  @keyframes expandWidth { from { width: 0; opacity: 0; } to { width: 56px; opacity: 1; } }
+
+  .hero-desc {
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--text-soft);
+    line-height: 1.9;
+    max-width: 380px;
+    margin-bottom: 44px;
+    letter-spacing: 0.3px;
+    opacity: 0;
+    animation: slideRight 0.8s ease 0.65s forwards;
+  }
+
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: slideRight 0.8s ease 0.8s forwards;
+  }
+
+  .btn-filled {
+    padding: 15px 38px;
+    background: var(--text);
+    color: var(--ivory);
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-filled::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gold);
+    transform: translateX(-100%);
+    transition: transform 0.35s ease;
+  }
+  .btn-filled:hover::after { transform: translateX(0); }
+  .btn-filled span { position: relative; z-index: 1; }
+
+  .btn-text-link {
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-mid);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.2s, gap 0.2s;
+  }
+  .btn-text-link:hover { color: var(--gold); gap: 14px; }
+  .btn-text-link::after { content: '→'; font-size: 14px; }
+
+  /* Right image grid */
+  .hero-right {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-img-main {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 8s ease;
+  }
+  .hero-right:hover .hero-img-main { transform: scale(1.03); }
+
+  /* Floating badge */
+  .hero-badge-float {
+    position: absolute;
+    bottom: 48px;
+    left: -32px;
+    background: var(--white);
+    padding: 20px 28px;
+    box-shadow: 0 20px 60px rgba(26,20,16,0.12);
+    z-index: 3;
+    opacity: 0;
+    animation: slideRight 0.9s ease 1.0s forwards;
+    min-width: 200px;
+  }
+  .hero-badge-float-label {
+    font-family: 'Jost', sans-serif;
+    font-size: 8px;
+    font-weight: 400;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+  .hero-badge-float-value {
+    font-family: 'Bodoni Moda', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+  .hero-badge-float-sub {
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    color: var(--text-soft);
+    margin-top: 4px;
+  }
+
+  @keyframes slideRight {
+    from { opacity: 0; transform: translateX(-20px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ── TRUST BAR ───────────────────────────────────────────── */
+  .trust-bar {
+    background: var(--cream);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    overflow: hidden;
+  }
+  .trust-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 48px;
+    border-right: 1px solid var(--border);
+  }
+  .trust-item:last-child { border-right: none; }
+  .trust-icon {
+    font-size: 16px;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+  .trust-label {
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+  .trust-sub {
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    font-weight: 300;
+    color: var(--text-soft);
+    letter-spacing: 0.5px;
+    margin-top: 1px;
+  }
+
+  /* ── INTRO SECTION ───────────────────────────────────────── */
+  .intro {
+    padding: 100px 8vw;
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 100px;
+    align-items: center;
+    background: var(--ivory);
+  }
+  .intro-tag {
+    font-family: 'Jost', sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+  }
+  .intro-heading {
+    font-family: 'Bodoni Moda', serif;
+    font-size: clamp(28px, 3vw, 44px);
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 24px;
+  }
+  .intro-heading em { font-style: italic; }
+  .intro-body {
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--text-soft);
+    line-height: 2.0;
+    margin-bottom: 32px;
+    letter-spacing: 0.3px;
+  }
+
+  .intro-stats {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+  .intro-stat-num {
+    font-family: 'Bodoni Moda', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+  .intro-stat-label {
+    font-family: 'Jost', sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    margin-top: 4px;
+  }
+
+  .intro-right {
+    position: relative;
+  }
+  .intro-img-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 12px;
+  }
+  .intro-img {
+    overflow: hidden;
+    background: var(--sand);
+  }
+  .intro-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s ease;
+  }
+  .intro-img:hover img { transform: scale(1.05); }
+  .intro-img:nth-child(1) { grid-row: 1 / 3; height: 420px; }
+  .intro-img:nth-child(2) { height: 200px; }
+  .intro-img:nth-child(3) { height: 208px; }
+
+  /* ── COLLECTIONS GRID ────────────────────────────────────── */
+  .collections {
+    padding: 80px 8vw 100px;
+    background: var(--cream);
+  }
+  .section-top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .section-tag {
+    font-family: 'Jost', sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Bodoni Moda', serif;
+    font-size: clamp(28px, 3.5vw, 48px);
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.1;
+  }
+  .section-title em { font-style: italic; }
+  .section-view-all {
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-mid);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 3px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .section-view-all:hover { color: var(--gold); border-color: var(--gold); }
+
+  .coll-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .coll-card {
+    position: relative;
+    overflow: hidden;
+    background: var(--sand);
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+  }
+
+  .coll-img {
+    width: 100%;
+    height: 420px;
+    display: block;
+    object-fit: cover;
+    transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .coll-card:hover .coll-img { transform: scale(1.06); }
+
+  .coll-info {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(to top, rgba(26,20,16,0.75) 0%, transparent 100%);
+    padding: 32px 24px 24px;
+    transform: translateY(0);
+  }
+  .coll-cat-label {
+    font-family: 'Jost', sans-serif;
+    font-size: 8px;
+    font-weight: 400;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold-pale);
+    margin-bottom: 6px;
+    opacity: 0.8;
+  }
+  .coll-name {
+    font-family: 'Bodoni Moda', serif;
+    font-size: 20px;
+    font-weight: 400;
+    color: #fff;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .coll-tryon {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Jost', sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold-pale);
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  .coll-card:hover .coll-tryon { opacity: 1; transform: translateY(0); }
+
+  /* ── VIRTUAL TRY-ON ──────────────────────────────────────── */
+  .tryon-band {
+    background: var(--text);
+    padding: 90px 8vw;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .tryon-visual-wrap {
+    position: relative;
+  }
+  .tryon-main-img {
+    width: 100%;
+    aspect-ratio: 4/5;
+    object-fit: cover;
+    display: block;
+  }
+  /* Gold corner accent */
+  .tryon-corner {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    width: 80px;
+    height: 80px;
+    border-top: 2px solid var(--gold);
+    border-right: 2px solid var(--gold);
+    pointer-events: none;
+  }
+  .tryon-corner-bl {
+    position: absolute;
+    bottom: -12px;
+    left: -12px;
+    width: 80px;
+    height: 80px;
+    border-bottom: 2px solid var(--gold);
+    border-left: 2px solid var(--gold);
+    pointer-events: none;
+  }
+  /* Live badge */
+  .tryon-live-badge {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    background: rgba(253,250,245,0.95);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .live-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #4CAF50;
+    animation: livePulse 1.5s ease-in-out infinite;
+  }
+  @keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+  .live-text {
+    font-family: 'Jost', sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .tryon-tag {
+    font-family: 'Jost', sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tryon-tag::before {
+    content: '';
+    display: block;
+    width: 20px;
+    height: 1px;
+    background: var(--gold-light);
+    opacity: 0.5;
+  }
+
+  .tryon-heading {
+    font-family: 'Bodoni Moda', serif;
+    font-size: clamp(30px, 3.5vw, 52px);
+    font-weight: 400;
+    color: var(--ivory);
+    line-height: 1.15;
+    margin-bottom: 24px;
+  }
+  .tryon-heading em { font-style: italic; color: var(--gold-light); }
+
+  .tryon-body {
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    font-weight: 300;
+    color: rgba(253,250,245,0.45);
+    line-height: 2.0;
+    margin-bottom: 44px;
+    letter-spacing: 0.3px;
+  }
+
+  .tryon-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    margin-bottom: 44px;
+  }
+  .tryon-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid rgba(184,146,42,0.1);
+  }
+  .tryon-step:last-child { border-bottom: none; padding-bottom: 0; }
+  .step-num {
+    font-family: 'Bodoni Moda', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: rgba(184,146,42,0.2);
+    line-height: 1;
+    min-width: 36px;
+  }
+  .step-title {
+    font-family: 'Jost', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ivory);
+    margin-bottom: 5px;
+  }
+  .step-desc {
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    font-weight: 300;
+    color: rgba(253,250,245,0.35);
+    line-height: 1.7;
+  }
+
+  /* ── TESTIMONIAL ─────────────────────────────────────────── */
+  .testimonial {
+    background: var(--ivory);
+    padding: 100px 8vw;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .testimonial-left {
+    position: relative;
+  }
+  .testimonial-img-wrap {
+    position: relative;
+  }
+  .testimonial-img {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    display: block;
+  }
+  .testimonial-quote-float {
+    position: absolute;
+    bottom: -24px;
+    right: -24px;
+    background: var(--gold);
+    padding: 28px 32px;
+    max-width: 260px;
+  }
+  .testimonial-quote-text {
+    font-family: 'Bodoni Moda', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--white);
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+  .testimonial-quote-author {
+    font-family: 'Jost', sans-serif;
+    font-size: 8px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .testimonial-tag {
+    font-family: 'Jost', sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+  }
+  .testimonial-heading {
+    font-family: 'Bodoni Moda', serif;
+    font-size: clamp(28px, 3vw, 44px);
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 24px;
+  }
+  .testimonial-heading em { font-style: italic; }
+  .testimonial-body {
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--text-soft);
+    line-height: 2.0;
+    margin-bottom: 36px;
+  }
+
+  .promise-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .promise-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--text-mid);
+    letter-spacing: 0.3px;
+  }
+  .promise-item::before {
+    content: '✦';
+    font-size: 9px;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+
+  /* ── CTA STRIP ───────────────────────────────────────────── */
+  .cta-strip {
+    background: var(--sand);
+    padding: 70px 8vw;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .cta-left-text {
+    font-family: 'Bodoni Moda', serif;
+    font-size: clamp(22px, 2.8vw, 38px);
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .cta-left-text em { font-style: italic; color: var(--gold); }
+  .cta-left-sub {
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--text-soft);
+    margin-top: 10px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── FOOTER ──────────────────────────────────────────────── */
+  .footer {
+    background: var(--text);
+    padding: 70px 8vw 40px;
+  }
+  .footer-top {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1fr;
+    gap: 60px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid rgba(184,146,42,0.08);
+    margin-bottom: 28px;
+  }
+  .footer-brand {
+    font-family: 'Bodoni Moda', serif;
+    font-size: 38px;
+    font-weight: 700;
+    color: var(--gold-light);
+    letter-spacing: 2px;
+    margin-bottom: 14px;
+    line-height: 1;
+  }
+  .footer-tagline {
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    font-weight: 300;
+    color: rgba(253,250,245,0.25);
+    line-height: 1.8;
+    max-width: 260px;
+    letter-spacing: 0.3px;
+    margin-bottom: 28px;
+  }
+  .footer-col-title {
+    font-family: 'Jost', sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 20px;
+    opacity: 0.6;
+  }
+  .footer-col a {
+    display: block;
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    font-weight: 300;
+    color: rgba(253,250,245,0.3);
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    margin-bottom: 10px;
+    transition: color 0.2s;
+  }
+  .footer-col a:hover { color: var(--gold-light); }
+  .footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .footer-copy {
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    font-weight: 300;
+    color: rgba(253,250,245,0.15);
+    letter-spacing: 2px;
+  }
+  .footer-gems {
+    font-size: 10px;
+    color: rgba(184,146,42,0.2);
+    letter-spacing: 10px;
+  }
+
+  /* ── RESPONSIVE ──────────────────────────────────────────── */
+  @media (max-width: 1100px) {
+    .coll-grid { grid-template-columns: repeat(2, 1fr); }
+    .coll-img { height: 320px; }
+  }
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { height: 55vw; }
+    .hero-badge-float { display: none; }
+    .intro { grid-template-columns: 1fr; gap: 40px; padding: 60px 6vw; }
+    .tryon-band { grid-template-columns: 1fr; gap: 40px; padding: 60px 6vw; }
+    .testimonial { grid-template-columns: 1fr; gap: 60px; padding: 60px 6vw; }
+    .testimonial-quote-float { position: static; max-width: 100%; margin-top: 20px; }
+    .footer-top { grid-template-columns: 1fr 1fr; gap: 40px; }
+  }
+  @media (max-width: 600px) {
+    .coll-grid { grid-template-columns: 1fr; }
+    .hero-left { padding: 60px 6vw; }
+    .trust-item { padding: 14px 20px; }
+    .footer-top { grid-template-columns: 1fr; }
+    .cta-strip { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+
+<!-- ── HERO ──────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-season">
+      <div class="hero-season-dot"></div>
+      <span class="hero-season-text">Spring Collection 2026</span>
+    </div>
+
+    <h1 class="hero-title">Crafted in</h1>
+    <div class="hero-title-italic">Pure Gold.</div>
+
+    <div class="hero-divider"></div>
+
+    <p class="hero-desc">
+      Discover jewelry that transcends time — hallmarked, handcrafted,
+      and made to be passed down through generations.
+      Try any piece virtually before it's yours.
+    </p>
+
+    <div class="hero-actions">
+      <a href="{% url 'menu' %}" class="btn-text-link">Browse Collections</a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <img
+      class="hero-img-main"
+      src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=900&q=80&auto=format&fit=crop"
+      alt="Tanishq Gold Jewelry"
+    />
+    
+  </div>
+</section>
+<div class="trust-bar">
+  <div class="trust-item">
+    <div class="trust-icon">✦</div>
+    <div>
+      <div class="trust-label">BIS Hallmarked</div>
+      <div class="trust-sub">Certified purity</div>
+    </div>
+  </div>
+  <div class="trust-item">
+    <div class="trust-icon">◈</div>
+    <div>
+      <div class="trust-label">Virtual Try-On</div>
+      <div class="trust-sub">AI-powered live camera</div>
+    </div>
+  </div>
+  <div class="trust-item">
+    <div class="trust-icon">❋</div>
+    <div>
+      <div class="trust-label">Free Shipping</div>
+      <div class="trust-sub">Orders above ₹5,000</div>
+    </div>
+  </div>
+  <div class="trust-item">
+    <div class="trust-icon">⟳</div>
+    <div>
+      <div class="trust-label">Lifetime Exchange</div>
+      <div class="trust-sub">Full value guarantee</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── INTRO ──────────────────────────────────────────────────── -->
+<section class="intro">
+  <div class="intro-left">
+    <div class="intro-tag">Our Heritage</div>
+    <h2 class="intro-heading">Three Decades of<br><em>Mastercraft</em></h2>
+    <p class="intro-body">
+      Since 1994, Tanishq has been synonymous with trust, purity,
+      and unmatched design. Every piece tells a story of skill passed
+      down through generations — now reimagined for the modern woman.
+    </p>
+    <div class="intro-stats">
+      <div>
+        <div class="intro-stat-num">30+</div>
+        <div class="intro-stat-label">Years</div>
+      </div>
+      <div>
+        <div class="intro-stat-num">500+</div>
+        <div class="intro-stat-label">Designs</div>
+      </div>
+      <div>
+        <div class="intro-stat-num">2M+</div>
+        <div class="intro-stat-label">Customers</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="intro-right">
+    <div class="intro-img-grid">
+      <div class="intro-img">
+        <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=500&q=80&auto=format&fit=crop" alt="Necklace"/>
+      </div>
+      <div class="intro-img">
+        <img src="https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=400&q=80&auto=format&fit=crop" alt="Earrings"/>
+      </div>
+      <div class="intro-img">
+        <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&q=80&auto=format&fit=crop" alt="Ring"/>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── COLLECTIONS ───────────────────────────────────────────── -->
+<section class="collections">
+  <div class="section-top">
+    <div>
+      <div class="section-tag">Handpicked For You</div>
+      <h2 class="section-title">Fine <em>Collections</em></h2>
+    </div>
+    <a href="{% url 'tryon' %}" class="section-view-all">View All →</a>
+  </div>
+
+  <div class="coll-grid">
+    {% for category in categories %}
+      <a href="{% url 'category_products' category.name %}" class="coll-card">
+        {% with first_product=category.products.first %}
+          {% if first_product and first_product.image %}
+            <img class="coll-img" src="{{ first_product.image.url }}" alt="{{ category.name }}"/>
+          {% else %}
+            <img class="coll-img" src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=700&q=80&auto=format&fit=crop" alt="{{ category.name }}"/>
+          {% endif %}
+        {% endwith %}
+        <div class="coll-info">
+          <div class="coll-cat-label">{{ category.description|default:"Fine Jewelry" }}</div>
+          <div class="coll-name">{{ category.name }}</div>
+          <span class="coll-tryon">Explore ✦</span>
+        </div>
+      </a>
+    {% empty %}
+      <p style="font-family:'Jost',sans-serif;color:var(--text-soft);letter-spacing:1px;">No collections available yet.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- ── VIRTUAL TRY-ON ─────────────────────────────────────────── -->
+<section class="tryon-band">
+  <div class="tryon-visual-wrap">
+    <img
+      class="tryon-main-img"
+      src="https://images.unsplash.com/photo-1583292650898-7d22cd27ca6f?w=700&q=80&auto=format&fit=crop"
+      alt="Virtual Try-On"
+    />
+    <div class="tryon-corner"></div>
+    <div class="tryon-corner-bl"></div>
+    <div class="tryon-live-badge">
+      <div class="live-dot"></div>
+      <span class="live-text">Live Camera Active</span>
+    </div>
+  </div>
+
+  <div class="tryon-text">
+    <div class="tryon-tag">AI Technology</div>
+    <h2 class="tryon-heading">Wear It Before<br><em>You Buy It</em></h2>
+    <p class="tryon-body">
+      Our MediaPipe-powered virtual try-on uses your live camera to
+      place necklaces, earrings and more exactly where they'd sit on you —
+      no app download, no waiting.
+    </p>
+
+    <div class="tryon-steps">
+      <div class="tryon-step">
+        <div class="step-num">01</div>
+        <div>
+          <div class="step-title">Pick a Piece</div>
+          <div class="step-desc">Choose any jewelry from our collection</div>
+        </div>
+      </div>
+      <div class="tryon-step">
+        <div class="step-num">02</div>
+        <div>
+          <div class="step-title">Open Camera</div>
+          <div class="step-desc">AI maps your face and shoulders in real time</div>
+        </div>
+      </div>
+      <div class="tryon-step">
+        <div class="step-num">03</div>
+        <div>
+          <div class="step-title">See the Look</div>
+          <div class="step-desc">Jewelry overlays precisely — capture & share</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TESTIMONIAL ────────────────────────────────────────────── -->
+<section class="testimonial">
+  <div class="testimonial-left">
+    <div class="testimonial-img-wrap">
+      <img
+        class="testimonial-img"
+        src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=80&auto=format&fit=crop"
+        alt="Happy Customer"
+      />
+    </div>
+    <div class="testimonial-quote-float">
+      <div class="testimonial-quote-text">
+        "I tried twelve necklaces virtually and found my perfect piece — all from home."
+      </div>
+      <div class="testimonial-quote-author">Priya Sharma &nbsp;· &nbsp;Mumbai</div>
+    </div>
+  </div>
+
+  <div class="testimonial-right">
+    <div class="testimonial-tag">Why Tanishq</div>
+    <h2 class="testimonial-heading">The <em>Tanishq</em><br>Promise</h2>
+    <p class="testimonial-body">
+      For over three decades we have built our reputation on one thing —
+      your trust. Every piece is hallmarked, every design is original,
+      and every purchase is backed by our lifetime guarantee.
+    </p>
+    <div class="promise-list">
+      <div class="promise-item">BIS hallmarked purity on every piece</div>
+      <div class="promise-item">Hand-crafted by master artisans</div>
+      <div class="promise-item">Lifetime exchange at full value</div>
+      <div class="promise-item">AI virtual try-on — no app needed</div>
+      <div class="promise-item">Free shipping &amp; 30-day returns</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA STRIP ──────────────────────────────────────────────── -->
+<div class="cta-strip">
+  <div>
+    <div class="cta-left-text">Ready to find your<br><em>perfect piece?</em></div>
+    <div class="cta-left-sub">Try any jewelry live on your camera — free, instant, no download.</div>
+  </div>
+  <a href="{% url 'register' %}" class="btn-filled">
+    <span>✦ &nbsp;Register</span>
+  </a>
+</div>
+
+
+{% endblock %}

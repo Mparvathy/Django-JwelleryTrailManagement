@@ -1,0 +1,578 @@
+{% extends 'base1.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Raleway:wght@300;400;500;600&display=swap');
+
+  :root {
+    --gold:      #C9A84C;
+    --gold-dark: #B8860B;
+    --gold-light:#E8CC7A;
+    --ivory:     #faf6f0;
+    --cream:     #f2ebe0;
+    --white:     #ffffff;
+    --text:      #2c2416;
+    --muted:     #7a6e60;
+    --border:    rgba(201,168,76,0.22);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .mcat-page {
+    min-height: 100vh;
+    background: var(--ivory);
+    padding: 48px 40px 80px;
+  }
+
+  .mcat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mcat-header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--text);
+    letter-spacing: 3px;
+  }
+  .mcat-header h1 span { color: var(--gold); }
+
+  .mcat-header p {
+    font-family: 'Raleway', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 5px;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 24px;
+    background: var(--text);
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.25s, color 0.25s;
+  }
+  .btn-add:hover { background: var(--gold-dark); color: white; }
+
+  .alert {
+    padding: 13px 18px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 13px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-left: 3px solid;
+    max-height: 60px;
+    overflow: hidden;
+    transition: opacity 0.8s ease, max-height 0.8s ease, padding 0.8s ease, margin 0.8s ease;
+  }
+  .alert-success { background: #f0faf2; color: #2d6a3f; border-color: #2d6a3f; }
+  .alert-error   { background: #fff5f5; color: #b03030; border-color: #b03030; }
+
+  .mcat-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    position: relative;
+  }
+  .mcat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .mcat-toolbar {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .search-input {
+    flex: 1;
+    max-width: 320px;
+    padding: 10px 14px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--ivory);
+    border: 1px solid var(--border);
+    outline: none;
+    transition: border-color 0.25s;
+  }
+  .search-input:focus { border-color: var(--gold); }
+  .search-input::placeholder { color: var(--muted); font-style: italic; }
+
+  .mcat-count {
+    font-family: 'Raleway', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: auto;
+    letter-spacing: 1px;
+  }
+  .mcat-count span { font-weight: 600; color: var(--gold-dark); }
+
+  .mcat-table { width: 100%; border-collapse: collapse; }
+
+  .mcat-table th {
+    font-family: 'Raleway', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold-dark);
+    padding: 13px 20px;
+    text-align: left;
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mcat-table td {
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(201,168,76,0.08);
+    font-family: 'Raleway', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    vertical-align: middle;
+  }
+
+  .mcat-table tr:last-child td { border-bottom: none; }
+  .mcat-table tbody tr { transition: background 0.2s; }
+  .mcat-table tbody tr:hover td { background: rgba(201,168,76,0.04); }
+
+  .row-num { font-family: 'Cinzel', serif; font-size: 12px; color: rgba(201,168,76,0.4); font-weight: 600; }
+  .cat-name { font-weight: 600; color: var(--text); letter-spacing: 0.3px; }
+  .cat-desc { color: var(--muted); font-size: 12px; max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+  .cat-date { font-size: 12px; color: var(--muted); letter-spacing: 0.3px; }
+
+  .action-wrap { display: flex; gap: 8px; }
+
+  .btn-edit {
+    padding: 7px 16px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--gold-dark);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-edit:hover { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+
+  .btn-delete {
+    padding: 7px 16px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border: 1px solid rgba(220,80,80,0.25);
+    background: transparent;
+    color: #c04040;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-delete:hover { border-color: #e05555; background: rgba(220,80,80,0.06); color: #e05555; }
+
+  .empty-state { padding: 60px 20px; text-align: center; }
+  .empty-state p { font-family: 'Raleway', sans-serif; font-size: 14px; color: var(--muted); letter-spacing: 1px; }
+  .empty-gem { font-size: 36px; color: rgba(201,168,76,0.2); display: block; margin-bottom: 14px; }
+
+  /* MODALS */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(3px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal-box {
+    background: var(--white);
+    border: 1px solid var(--border);
+    width: 100%;
+    max-width: 480px;
+    position: relative;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+    margin: 20px;
+  }
+  .modal-overlay.open .modal-box { transform: translateY(0); }
+
+  .modal-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .modal-header {
+    padding: 24px 28px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-header h3 { font-family: 'Cinzel', serif; font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: 2px; }
+  .modal-header h3 span { color: var(--gold); }
+
+  .modal-close { background: none; border: none; font-size: 20px; color: var(--muted); cursor: pointer; transition: color 0.2s; }
+  .modal-close:hover { color: var(--text); }
+
+  .modal-body { padding: 28px; }
+
+  .modal-group { margin-bottom: 22px; }
+
+  .modal-label {
+    font-family: 'Raleway', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold-dark);
+    display: block;
+    margin-bottom: 9px;
+  }
+
+  .modal-input {
+    width: 100%;
+    padding: 12px 14px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--ivory);
+    border: 1px solid var(--border);
+    outline: none;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  .modal-input:focus { border-color: var(--gold); background: var(--white); box-shadow: 0 0 0 3px rgba(201,168,76,0.08); }
+  textarea.modal-input { min-height: 90px; resize: vertical; line-height: 1.6; }
+
+  .modal-actions { display: flex; gap: 10px; padding-top: 20px; border-top: 1px solid var(--border); margin-top: 4px; }
+
+  .btn-modal-save {
+    flex: 1;
+    padding: 13px;
+    background: var(--text);
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    border: 1px solid var(--text);
+    cursor: pointer;
+    transition: background 0.25s, color 0.25s;
+  }
+  .btn-modal-save:hover { background: var(--gold-dark); border-color: var(--gold-dark); color: white; }
+
+  .btn-modal-cancel {
+    padding: 13px 20px;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Raleway', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-modal-cancel:hover { border-color: var(--gold); color: var(--gold-dark); }
+
+  /* DELETE MODAL */
+  .del-modal-box {
+    background: var(--white);
+    border: 1px solid rgba(220,80,80,0.3);
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+    margin: 20px;
+    text-align: center;
+    padding: 40px 32px 32px;
+  }
+  .modal-overlay.open .del-modal-box { transform: translateY(0); }
+
+  .del-modal-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #e05555, transparent);
+  }
+
+  .del-icon { font-size: 36px; display: block; margin-bottom: 16px; }
+  .del-modal-box h3 { font-family: 'Cinzel', serif; font-size: 17px; color: var(--text); letter-spacing: 2px; margin-bottom: 10px; }
+  .del-modal-box p { font-family: 'Raleway', sans-serif; font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 28px; }
+  .del-modal-box p strong { color: var(--text); font-weight: 600; }
+
+  .del-actions { display: flex; gap: 10px; justify-content: center; }
+
+  .btn-confirm-del {
+    padding: 12px 28px;
+    background: #c04040;
+    color: white;
+    font-family: 'Raleway', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: 1px solid #c04040;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-confirm-del:hover { background: #e05555; border-color: #e05555; }
+
+  .btn-cancel-del {
+    padding: 12px 28px;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Raleway', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-cancel-del:hover { border-color: var(--gold); color: var(--gold-dark); }
+
+  @media (max-width: 768px) {
+    .mcat-page { padding: 24px 16px; }
+    .mcat-table th:nth-child(3), .mcat-table td:nth-child(3) { display: none; }
+  }
+</style>
+
+<!-- Hidden URL helpers — safe way to pass Django URLs to JS -->
+<input type="hidden" id="edit-url-base"   value="{% url 'admin_edit_category'   pk=1 %}">
+<input type="hidden" id="delete-url-base" value="{% url 'admin_delete_category' pk=1 %}">
+
+{% if edit_cat %}
+<div id="edit-data"
+  data-pk="{{ edit_cat.pk }}"
+  data-name="{{ edit_cat.name|escapejs }}"
+  data-desc="{{ edit_cat.description|default:''|escapejs }}"
+  style="display:none;"></div>
+{% endif %}
+
+<div class="mcat-page">
+
+  <div class="mcat-header">
+    <div>
+      <h1>Manage <span>Categories</span></h1>
+    </div>
+    <a href="{% url 'admin_add_category' %}" class="btn-add">✦ &nbsp;Add New</a>
+  </div>
+
+  {% if success %}
+  <div class="alert alert-success" id="alert-msg">✔ &nbsp;{{ success }}</div>
+  {% endif %}
+  {% if error %}
+  <div class="alert alert-error" id="alert-msg">⚠ &nbsp;{{ error }}</div>
+  {% endif %}
+
+  <div class="mcat-card">
+    <div class="mcat-toolbar">
+      <input type="text" class="search-input" placeholder="Search categories..." oninput="filterTable(this)"/>
+      <span class="mcat-count">Total: <span>{{ categories|length }}</span> categories</span>
+    </div>
+
+    <table class="mcat-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Category Name</th>
+          <th>Description</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="cat-tbody">
+        {% for cat in categories %}
+        <tr>
+          <td><span class="row-num">{{ forloop.counter }}</span></td>
+          <td><span class="cat-name">{{ cat.name }}</span></td>
+          <td><span class="cat-desc">{{ cat.description|default:"—" }}</span></td>
+          <td><span class="cat-date">{{ cat.created_at|date:"d M Y" }}</span></td>
+          <td>
+            <div class="action-wrap">
+              <button class="btn-edit"
+                data-pk="{{ cat.pk }}"
+                data-name="{{ cat.name|escapejs }}"
+                data-desc="{{ cat.description|default:''|escapejs }}"
+                onclick="openEditFromBtn(this)">Edit
+              </button>
+              <button class="btn-delete"
+                data-pk="{{ cat.pk }}"
+                data-name="{{ cat.name|escapejs }}"
+                onclick="openDeleteFromBtn(this)">Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5">
+            <div class="empty-state">
+              <span class="empty-gem">◻</span>
+              <p>No categories yet. Add your first one!</p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Edit <span>Category</span></h3>
+      <button class="modal-close" onclick="closeModal('edit-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <form method="POST" id="edit-form" action="">
+        {% csrf_token %}
+        <div class="modal-group">
+          <label class="modal-label">Category Name <span style="color:#e05555;">*</span></label>
+          <input type="text" name="name" id="edit-name" class="modal-input" required maxlength="100"/>
+        </div>
+        <div class="modal-group">
+          <label class="modal-label">Description</label>
+          <textarea name="description" id="edit-desc" class="modal-input" maxlength="500"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn-modal-save">✦ &nbsp;Update</button>
+          <button type="button" class="btn-modal-cancel" onclick="closeModal('edit-modal')">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="del-modal-box">
+    <span class="del-icon">⚠</span>
+    <h3>Delete Category</h3>
+    <p>Are you sure you want to delete <strong id="del-cat-name"></strong>?<br/>This action cannot be undone.</p>
+    <form method="POST" id="delete-form" action="">
+      {% csrf_token %}
+      <div class="del-actions">
+        <button type="submit" class="btn-confirm-del">Yes, Delete</button>
+        <button type="button" class="btn-cancel-del" onclick="closeModal('delete-modal')">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // ── URL helpers from hidden inputs ────────────────────────
+  const editBase   = document.getElementById('edit-url-base').value;
+  const deleteBase = document.getElementById('delete-url-base').value;
+
+  function buildUrl(base, pk) {
+    return base.replace('/1/', '/' + pk + '/');
+  }
+
+  // ── Edit Modal ────────────────────────────────────────────
+  function openEditFromBtn(btn) {
+    openEdit(btn.dataset.pk, btn.dataset.name, btn.dataset.desc);
+  }
+  function openEdit(pk, name, desc) {
+    document.getElementById('edit-name').value  = name;
+    document.getElementById('edit-desc').value  = desc;
+    document.getElementById('edit-form').action = buildUrl(editBase, pk);
+    openModal('edit-modal');
+  }
+
+  // ── Delete Modal ──────────────────────────────────────────
+  function openDeleteFromBtn(btn) {
+    openDelete(btn.dataset.pk, btn.dataset.name);
+  }
+  function openDelete(pk, name) {
+    document.getElementById('del-cat-name').textContent  = '"' + name + '"';
+    document.getElementById('delete-form').action = buildUrl(deleteBase, pk);
+    openModal('delete-modal');
+  }
+
+  function openModal(id) {
+    document.getElementById(id).classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // Close on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+      if (e.target === this) closeModal(this.id);
+    });
+  });
+
+  // ── Search filter ─────────────────────────────────────────
+  function filterTable(input) {
+    const q = input.value.toLowerCase();
+    document.querySelectorAll('#cat-tbody tr').forEach(row => {
+      row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    // Auto open edit modal if edit_cat passed from view
+    const editData = document.getElementById('edit-data');
+    if (editData) {
+      openEdit(editData.dataset.pk, editData.dataset.name, editData.dataset.desc);
+    }
+
+    // Auto vanish alerts after 10s
+    const alertMsg = document.getElementById('alert-msg');
+    if (alertMsg) {
+      setTimeout(() => {
+        alertMsg.style.opacity   = '0';
+        alertMsg.style.maxHeight = '0';
+        alertMsg.style.padding   = '0';
+        alertMsg.style.margin    = '0';
+      }, 10000);
+    }
+  });
+</script>
+
+{% endblock %}

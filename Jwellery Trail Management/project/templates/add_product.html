@@ -1,0 +1,334 @@
+{% extends 'base1.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Raleway:wght@300;400;500;600&display=swap');
+
+  :root {
+    --gold:      #C9A84C;
+    --gold-dark: #B8860B;
+    --gold-light:#E8CC7A;
+    --ivory:     #faf6f0;
+    --cream:     #f2ebe0;
+    --white:     #ffffff;
+    --text:      #2c2416;
+    --muted:     #7a6e60;
+    --border:    rgba(201,168,76,0.22);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .prod-page {
+    min-height: 100vh;
+    background: var(--ivory);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 60px 20px 80px;
+  }
+
+  .prod-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    width: 100%;
+    max-width: 640px;
+    box-shadow: 0 10px 40px rgba(184,134,11,0.08);
+    position: relative;
+    animation: cardIn 0.5s cubic-bezier(0.22,1,0.36,1) forwards;
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  @keyframes cardIn { to { opacity:1; transform:translateY(0); } }
+
+  .prod-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .prod-card-header {
+    padding: 30px 36px 22px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+  .prod-gem { font-size: 26px; color: var(--gold); display: block; margin-bottom: 10px; }
+  .prod-card-header h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 20px; font-weight: 600;
+    color: var(--text); letter-spacing: 4px; margin-bottom: 6px;
+  }
+  .prod-card-header h2 span { color: var(--gold); }
+  .prod-card-header p { font-family: 'Raleway', sans-serif; font-size: 12px; color: var(--muted); letter-spacing: 1px; }
+
+  .prod-card-body { padding: 32px 36px 36px; }
+
+  .alert {
+    padding: 13px 16px;
+    font-family: 'Raleway', sans-serif; font-size: 13px;
+    margin-bottom: 24px; display: flex; align-items: center; gap: 10px;
+    border-left: 3px solid; max-height: 60px; overflow: hidden;
+    transition: opacity 0.8s ease, max-height 0.8s ease, padding 0.8s ease, margin 0.8s ease;
+  }
+  .alert-success { background: #f0faf2; color: #2d6a3f; border-color: #2d6a3f; }
+  .alert-error   { background: #fff5f5; color: #b03030; border-color: #b03030; }
+
+  /* Two-column grid for fields */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 24px;
+  }
+  .form-grid .form-group.full { grid-column: 1 / -1; }
+
+  .form-group { margin-bottom: 22px; position: relative; }
+
+  .form-label {
+    font-family: 'Raleway', sans-serif; font-size: 10px; font-weight: 600;
+    letter-spacing: 4px; text-transform: uppercase; color: var(--gold-dark);
+    display: block; margin-bottom: 10px;
+  }
+  .form-label span { color: #e05555; margin-left: 2px; }
+
+  .form-input {
+    width: 100%; padding: 12px 14px;
+    font-family: 'Raleway', sans-serif; font-size: 14px; color: var(--text);
+    background: var(--ivory); border: 1px solid var(--border); outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+  }
+  .form-input::placeholder { color: rgba(122,110,96,0.45); font-style: italic; }
+  .form-input:focus { border-color: var(--gold); background: var(--white); box-shadow: 0 0 0 3px rgba(201,168,76,0.08); }
+
+  select.form-input { cursor: pointer; }
+  textarea.form-input { resize: vertical; min-height: 100px; line-height: 1.7; }
+
+  /* Image upload */
+  .image-upload-wrap {
+    border: 2px dashed var(--border);
+    background: var(--ivory);
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.25s, background 0.25s;
+    position: relative;
+  }
+  .image-upload-wrap:hover { border-color: var(--gold); background: rgba(201,168,76,0.03); }
+  .image-upload-wrap input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .upload-icon { font-size: 28px; color: rgba(201,168,76,0.4); display: block; margin-bottom: 8px; }
+  .upload-text { font-family: 'Raleway', sans-serif; font-size: 12px; color: var(--muted); letter-spacing: 0.5px; }
+  .upload-text span { color: var(--gold-dark); font-weight: 600; }
+  .upload-preview {
+    margin-top: 12px; display: none;
+  }
+  .upload-preview img {
+    max-height: 120px; max-width: 100%; border: 1px solid var(--border); object-fit: cover;
+  }
+
+  /* Toggle switch for is_active */
+  .toggle-wrap {
+    display: flex; align-items: center; gap: 12px; padding: 12px 0;
+  }
+  .toggle-label { font-family: 'Raleway', sans-serif; font-size: 13px; color: var(--text); letter-spacing: 0.3px; }
+
+  .toggle-switch {
+    position: relative; width: 44px; height: 24px; flex-shrink: 0;
+  }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; inset: 0; background: #ddd; border-radius: 24px;
+    cursor: pointer; transition: background 0.3s;
+  }
+  .toggle-slider::before {
+    content: ''; position: absolute;
+    width: 18px; height: 18px; left: 3px; bottom: 3px;
+    background: white; border-radius: 50%; transition: transform 0.3s;
+  }
+  .toggle-switch input:checked + .toggle-slider { background: var(--gold); }
+  .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+  /* Buttons */
+  .form-actions {
+    display: flex; gap: 12px; margin-top: 28px;
+    padding-top: 24px; border-top: 1px solid var(--border);
+  }
+  .btn-submit {
+    flex: 1; padding: 14px;
+    background: var(--text); color: var(--gold);
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600;
+    letter-spacing: 4px; text-transform: uppercase;
+    border: 1px solid var(--text); cursor: pointer;
+    position: relative; overflow: hidden;
+    transition: background 0.3s, color 0.3s;
+  }
+  .btn-submit::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.18), transparent);
+    transform: translateX(-100%); transition: transform 0.5s ease;
+  }
+  .btn-submit:hover::before { transform: translateX(100%); }
+  .btn-submit:hover { background: var(--gold-dark); border-color: var(--gold-dark); color: white; }
+
+  .btn-reset {
+    padding: 14px 22px; background: transparent; color: var(--muted);
+    font-family: 'Raleway', sans-serif; font-size: 12px; font-weight: 500;
+    letter-spacing: 2px; text-transform: uppercase;
+    border: 1px solid var(--border); cursor: pointer; transition: all 0.25s;
+  }
+  .btn-reset:hover { border-color: var(--gold); color: var(--gold-dark); }
+
+  @media (max-width: 560px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .prod-card-body { padding: 24px 20px; }
+    .prod-card-header { padding: 24px 20px 18px; }
+  }
+</style>
+
+<div class="prod-page">
+  <div class="prod-card">
+
+    <div class="prod-card-header">
+      <span class="prod-gem">◈</span>
+      <h2>Add <span>Product</span></h2>
+      <p>Add a new jewelry product to Tanishq</p>
+    </div>
+
+    <div class="prod-card-body">
+
+      {% if success %}
+      <div class="alert alert-success" id="alert-msg">✔ &nbsp;{{ success }}</div>
+      {% endif %}
+      {% if error %}
+      <div class="alert alert-error" id="alert-msg">⚠ &nbsp;{{ error }}</div>
+      {% endif %}
+
+      <form method="POST" enctype="multipart/form-data" id="prod-form">
+        {% csrf_token %}
+
+        <div class="form-grid">
+
+          <!-- Name -->
+          <div class="form-group full">
+            <label class="form-label">Product Name <span>*</span></label>
+            <input type="text" name="name" class="form-input"
+              placeholder="e.g. Gold Solitaire Ring..." maxlength="200" required/>
+          </div>
+
+          <!-- Category -->
+          <div class="form-group">
+            <label class="form-label">Category <span>*</span></label>
+            <select name="category" class="form-input" required>
+              <option value="">-- Select --</option>
+              {% for cat in categories %}
+              <option value="{{ cat.pk }}">{{ cat.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Price -->
+          <div class="form-group">
+            <label class="form-label">Price (₹) <span>*</span></label>
+            <input type="number" name="price" class="form-input"
+              placeholder="e.g. 24500" min="0" step="0.01" required/>
+          </div>
+
+          <!-- Stock -->
+          <div class="form-group">
+            <label class="form-label">Stock</label>
+            <input type="number" name="stock" class="form-input"
+              placeholder="e.g. 10" min="0" value="0"/>
+          </div>
+
+          <!-- Status -->
+          <div class="form-group" style="display:flex; align-items:center;">
+            <div>
+              <label class="form-label">Status</label>
+              <div class="toggle-wrap">
+                <label class="toggle-switch">
+                  <input type="checkbox" name="is_active" checked/>
+                  <span class="toggle-slider"></span>
+                </label>
+                <span class="toggle-label">Active</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group full">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-input"
+              placeholder="Product description..."></textarea>
+          </div>
+
+          <!-- Image -->
+          <div class="form-group full">
+            <label class="form-label">Product Image</label>
+            <div class="image-upload-wrap" id="upload-wrap">
+              <input type="file" name="image" accept="image/*"
+                onchange="previewImage(this)"/>
+              <span class="upload-icon">◈</span>
+              <div class="upload-text">
+                <span>Click to upload</span> or drag & drop<br/>
+                PNG, JPG, WEBP supported
+              </div>
+              <div class="upload-preview" id="preview-wrap">
+                <img id="preview-img" src="" alt="Preview"/>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-submit">✦ &nbsp;Save Product</button>
+          <button type="reset" class="btn-reset" onclick="resetForm()">Reset</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function previewImage(input) {
+    const wrap = document.getElementById('preview-wrap');
+    const img  = document.getElementById('preview-img');
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        img.src = e.target.result;
+        wrap.style.display = 'block';
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  function resetForm() {
+    document.getElementById('preview-wrap').style.display = 'none';
+    document.getElementById('preview-img').src = '';
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    // Clear form on success
+    const success = document.querySelector('.alert-success');
+    if (success) {
+      document.getElementById('prod-form').reset();
+      resetForm();
+    }
+    // Auto vanish alerts after 10s
+    const alertMsg = document.getElementById('alert-msg');
+    if (alertMsg) {
+      setTimeout(() => {
+        alertMsg.style.opacity   = '0';
+        alertMsg.style.maxHeight = '0';
+        alertMsg.style.padding   = '0';
+        alertMsg.style.margin    = '0';
+      }, 10000);
+    }
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,358 @@
+{% extends 'base2.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #f8f8f8; font-family: 'Segoe UI', sans-serif; }
+
+  .shop-layout {
+    display: flex;
+    gap: 24px;
+    padding: 30px 40px;
+    align-items: flex-start;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 16px;
+    position: sticky;
+    top: 20px;
+  }
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    color: #444;
+    font-size: 14px;
+    transition: background 0.2s;
+  }
+  .sidebar-item:hover { background: #fdf6f0; color: #8B5E3C; }
+  .sidebar-item.active { color: #8B5E3C; font-weight: 600; }
+  .sidebar-item.active .arrow { margin-left: auto; color: #8B5E3C; }
+  .sidebar-icon { font-size: 18px; }
+  .arrow { margin-left: auto; font-size: 16px; }
+
+  /* ── Main ── */
+  .main-content { flex: 1; }
+  .cat-section { margin-bottom: 48px; }
+  .cat-title { font-size: 20px; font-weight: 600; color: #222; margin-bottom: 20px; }
+
+  /* ── Product Grid ── */
+  .prod-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .prod-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .prod-img-wrap {
+    position: relative;
+    height: 260px;
+    background: #fafafa;
+  }
+  .prod-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  /* AR icon */
+  .ar-icon {
+    position: absolute;
+    top: 12px; right: 12px;
+    color: #8B5E3C;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  /* Try On button */
+  .try-on-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: #f5ece4;
+    color: #8B5E3C;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+  }
+  .try-on-btn:hover { background: #e8d5c4; }
+
+  .prod-body {
+    padding: 12px 14px 16px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .prod-info .prod-name { font-size: 14px; font-weight: 500; color: #222; margin-bottom: 4px; }
+  .prod-info .prod-price { font-size: 15px; font-weight: 600; color: #222; }
+
+  /* toast */
+  #cam-toast {
+    position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+    background: #2c2416; color: #fff;
+    font-size: 12px; padding: 12px 20px; border-radius: 6px;
+    opacity: 0; transform: translateY(10px);
+    transition: opacity 0.3s, transform 0.3s; pointer-events: none;
+  }
+  #cam-toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ── Fullscreen Camera Overlay ── */
+  .cam-overlay {
+    position: fixed; inset: 0; z-index: 99999;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .cam-overlay.open { opacity: 1; pointer-events: all; }
+  .cam-modal { position: relative; width: 100vw; height: 100vh; background: #000; overflow: hidden; }
+
+  .cam-video-wrap { position: absolute; inset: 0; }
+  .cam-video-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .cam-loading {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    background: #0f0e0b; z-index: 5;
+  }
+  .cam-loading p { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: rgba(139,94,60,0.7); }
+  .cam-spinner {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: #8B5E3C; border-bottom-color: #8B5E3C;
+    animation: camSpin 1s linear infinite;
+  }
+  @keyframes camSpin { to { transform: rotate(360deg); } }
+
+  .cam-header {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+    padding: 20px 28px 40px;
+    display: flex; align-items: flex-start; justify-content: space-between;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
+  }
+  .cam-header-left h3 { font-size: 14px; color: #fff; letter-spacing: 3px; }
+  .cam-product-name { font-size: 11px; color: #C9A07A; letter-spacing: 2px; margin-top: 4px; }
+  .cam-close {
+    background: rgba(0,0,0,0.45); border: 1px solid rgba(139,94,60,0.4);
+    color: #fff; font-size: 18px; width: 42px; height: 42px;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; border-radius: 6px;
+  }
+  .cam-close:hover { background: rgba(224,85,85,0.7); }
+
+  .cam-controls {
+    position: absolute; bottom: 0; left: 0; right: 0; z-index: 10;
+    padding: 40px 28px 28px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%);
+  }
+  .cam-info { font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 1px; }
+  .cam-info span { color: #C9A07A; }
+  .cam-btns { display: flex; gap: 10px; }
+  .btn-cam-action {
+    padding: 10px 22px; font-size: 11px; font-weight: 600;
+    letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+    border: 1px solid rgba(139,94,60,0.4); background: rgba(0,0,0,0.45);
+    color: rgba(255,255,255,0.8); backdrop-filter: blur(4px); transition: all 0.2s;
+  }
+  .btn-cam-action:hover { border-color: #8B5E3C; color: #C9A07A; }
+  .btn-cam-snap {
+    padding: 10px 26px; font-size: 11px; font-weight: 600;
+    letter-spacing: 3px; text-transform: uppercase; cursor: pointer;
+    background: rgba(44,36,22,0.85); color: #C9A07A;
+    border: 1px solid #8B5E3C; transition: all 0.25s; backdrop-filter: blur(4px);
+  }
+  .btn-cam-snap:hover { background: #8B5E3C; color: white; }
+  .size-control { display: flex; align-items: center; gap: 10px; }
+  .size-control label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.6); }
+  .size-slider { width: 100px; accent-color: #8B5E3C; cursor: pointer; }
+
+  @media (max-width: 900px) {
+    .shop-layout { flex-direction: column; padding: 20px; }
+    .sidebar { width: 100%; position: static; }
+    .prod-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 500px) { .prod-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 600px) { .cam-controls { flex-direction: column; align-items: flex-start; } }
+</style>
+
+<div id="cam-toast">✦ Camera Opening...</div>
+
+<div class="shop-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    {% for cat in categories %}
+    <a class="sidebar-item {% if forloop.first %}active{% endif %}" href="#cat-{{ cat.pk }}">
+      <span class="sidebar-icon">
+        {% if forloop.counter == 1 %}💎
+        {% elif forloop.counter == 2 %}💍
+        {% elif forloop.counter == 3 %}✨
+        {% elif forloop.counter == 4 %}📿
+        {% else %}💫{% endif %}
+      </span>
+      {{ cat.name }} ({{ cat.products.all|length }})
+      {% if forloop.first %}<span class="arrow">→</span>{% endif %}
+    </a>
+    {% endfor %}
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content">
+    {% for cat in categories %}
+    {% with products=cat.products.all %}
+    <section class="cat-section cat-block" id="cat-{{ cat.pk }}">
+      <div class="cat-title">{{ cat.name }}</div>
+
+      {% if products %}
+      <div class="prod-grid">
+        {% for product in products %}
+        {% if product.is_active %}
+        <div class="prod-card">
+          <div class="prod-img-wrap">
+            {% if product.image %}
+              <img src="{{ product.image.url }}" alt="{{ product.name }}" />
+            {% else %}
+              <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=500&q=80" alt="{{ product.name }}" />
+            {% endif %}
+            <span class="ar-icon">⬡</span>
+          </div>
+
+          <button class="try-on-btn"
+            data-id="{{ product.pk }}"
+            data-name="{{ product.name|escapejs }}"
+            onclick="openCamera(this.dataset.id, this.dataset.name)">
+            Try On
+          </button>
+
+          <div class="prod-body">
+            <div class="prod-info">
+              <div class="prod-name">{{ product.name }}</div>
+              <div class="prod-price">₹{{ product.price }}</div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+      {% else %}
+        <p style="color:#aaa;font-size:13px;">No products in this category yet.</p>
+      {% endif %}
+    </section>
+    {% endwith %}
+    {% empty %}
+    <div style="padding:60px 20px;text-align:center;color:#aaa;font-size:14px;">No collections available yet.</div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Camera Overlay -->
+<div class="cam-overlay" id="cam-overlay">
+  <div class="cam-modal">
+    <div class="cam-header">
+      <div class="cam-header-left">
+        <h3>✦ Virtual Try-On</h3>
+        <div class="cam-product-name" id="cam-product-name">Loading...</div>
+      </div>
+      <button class="cam-close" onclick="closeCamera()">✕</button>
+    </div>
+    <div class="cam-video-wrap">
+      <div class="cam-loading" id="cam-loading">
+        <div class="cam-spinner"></div>
+        <p>Starting Camera...</p>
+      </div>
+      <img id="stream-img" src="" alt="Try On Stream" style="display:none;"
+           onload="document.getElementById('cam-loading').style.display='none'; this.style.display='block';" />
+    </div>
+    <div class="cam-controls">
+      <div class="size-control">
+        <label>Size</label>
+        <input type="range" class="size-slider" id="size-slider" min="0.5" max="2.5" step="0.05" value="1.0" />
+      </div>
+      <div class="cam-info">Live tracking &nbsp;·&nbsp; <span>Jewellery ✦</span></div>
+      <div class="cam-btns">
+        <button class="btn-cam-action" onclick="capturePhoto()">📷 &nbsp;Capture</button>
+        <button class="btn-cam-snap" onclick="closeCamera()">✕ &nbsp;Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var currentProductId = null;
+  var sizeMultiplier = 1.0;
+
+  // Sidebar smooth scroll + active
+  document.querySelectorAll('.sidebar-item').forEach(function(item) {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      var target = document.querySelector(item.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.querySelectorAll('.sidebar-item').forEach(function(i) { i.classList.remove('active'); });
+      item.classList.add('active');
+    });
+  });
+
+  document.getElementById('size-slider').addEventListener('input', function() {
+    sizeMultiplier = parseFloat(this.value);
+    if (currentProductId) {
+      document.getElementById('stream-img').src = '/tryon/stream/' + currentProductId + '/?size=' + sizeMultiplier;
+    }
+  });
+
+  function openCamera(productId, name) {
+    currentProductId = productId;
+    document.getElementById('cam-product-name').textContent = name;
+    document.getElementById('cam-loading').style.display = 'flex';
+    document.getElementById('cam-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    var img = document.getElementById('stream-img');
+    img.style.display = 'none';
+    img.src = '/tryon/stream/' + productId + '/?size=' + sizeMultiplier;
+  }
+
+  function closeCamera() {
+    var img = document.getElementById('stream-img');
+    img.src = ''; img.style.display = 'none';
+    currentProductId = null;
+    fetch('/tryon/stop/').catch(function() {});
+    document.getElementById('cam-loading').style.display = 'none';
+    document.getElementById('cam-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function capturePhoto() {
+    var img = document.getElementById('stream-img');
+    if (!img.src || !currentProductId) return;
+    var canvas = document.createElement('canvas');
+    canvas.width = img.naturalWidth || img.width;
+    canvas.height = img.naturalHeight || img.height;
+    canvas.getContext('2d').drawImage(img, 0, 0);
+    var a = document.createElement('a');
+    a.href = canvas.toDataURL('image/jpeg', 0.9);
+    a.download = 'tryon-' + currentProductId + '.jpg';
+    a.click();
+  }
+
+  document.getElementById('cam-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeCamera();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeCamera();
+  });
+</script>
+
+{% endblock %}

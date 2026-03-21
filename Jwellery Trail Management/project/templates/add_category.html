@@ -1,0 +1,336 @@
+{% extends 'base1.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Raleway:wght@300;400;500;600&display=swap');
+
+  :root {
+    --gold:       #C9A84C;
+    --gold-dark:  #B8860B;
+    --gold-light: #E8CC7A;
+    --ivory:      #faf6f0;
+    --white:      #ffffff;
+    --text:       #2c2416;
+    --muted:      #7a6e60;
+    --border:     rgba(201,168,76,0.22);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ── PAGE ───────────────────────────────────────────────── */
+  .cat-page {
+    min-height: 100vh;
+    background: var(--ivory);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+  }
+
+  /* ── CARD ───────────────────────────────────────────────── */
+  .cat-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    width: 100%;
+    max-width: 560px;
+    box-shadow: 0 10px 40px rgba(184,134,11,0.08);
+    position: relative;
+    animation: cardIn 0.5s cubic-bezier(0.22,1,0.36,1) forwards;
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  @keyframes cardIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Gold top bar */
+  .cat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  /* ── CARD HEADER ────────────────────────────────────────── */
+  .cat-card-header {
+    padding: 30px 36px 22px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .cat-gem {
+    font-size: 26px;
+    color: var(--gold);
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .cat-card-header h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 4px;
+    margin-bottom: 6px;
+  }
+
+  .cat-card-header h2 span { color: var(--gold); }
+
+  .cat-card-header p {
+    font-family: 'Raleway', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  /* ── CARD BODY ──────────────────────────────────────────── */
+  .cat-card-body { padding: 32px 36px 36px; }
+
+  /* ── ALERTS ─────────────────────────────────────────────── */
+  .alert {
+    padding: 13px 16px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 13px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-left: 3px solid;
+  }
+  .alert-success { background: #f0faf2; color: #2d6a3f; border-color: #2d6a3f; }
+  .alert-error   { background: #fff5f5; color: #b03030; border-color: #b03030; }
+
+  /* ── FORM FIELDS ────────────────────────────────────────── */
+  .form-group { margin-bottom: 24px; position: relative; }
+
+  .form-label {
+    font-family: 'Raleway', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold-dark);
+    display: block;
+    margin-bottom: 10px;
+  }
+  .form-label span { color: #e05555; margin-left: 2px; }
+
+  .form-input {
+    width: 100%;
+    padding: 13px 16px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--ivory);
+    border: 1px solid var(--border);
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+  }
+  .form-input::placeholder { color: rgba(122,110,96,0.45); font-style: italic; }
+  .form-input:focus {
+    border-color: var(--gold);
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.08);
+  }
+
+  /* Gold focus line */
+  .focus-line {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 0; height: 2px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    transition: width 0.4s ease;
+    pointer-events: none;
+  }
+  .form-input:focus ~ .focus-line { width: 100%; }
+
+  textarea.form-input {
+    resize: vertical;
+    min-height: 110px;
+    line-height: 1.7;
+  }
+
+  .char-counter {
+    font-family: 'Raleway', sans-serif;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    margin-top: 5px;
+  }
+
+  /* ── BUTTONS ────────────────────────────────────────────── */
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 30px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-submit {
+    flex: 1;
+    padding: 14px;
+    background: var(--text);
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    border: 1px solid var(--text);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s, color 0.3s;
+  }
+  .btn-submit::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.18), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.5s ease;
+  }
+  .btn-submit:hover::before { transform: translateX(100%); }
+  .btn-submit:hover { background: var(--gold-dark); border-color: var(--gold-dark); color: white; }
+
+  .btn-reset {
+    padding: 14px 22px;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Raleway', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .btn-reset:hover { border-color: var(--gold); color: var(--gold-dark); }
+
+  @media (max-width: 520px) {
+    .cat-card-body { padding: 24px 20px; }
+    .cat-card-header { padding: 24px 20px 18px; }
+  }
+</style>
+
+<div class="cat-page">
+  <div class="cat-card">
+
+    <!-- Header -->
+    <div class="cat-card-header">
+      <span class="cat-gem">◻</span>
+      <h2>Add <span>Category</span></h2>
+      <p>Create a new jewelry category</p>
+    </div>
+
+    <!-- Body -->
+    <div class="cat-card-body">
+
+      {% if success %}
+      <div class="alert alert-success">✔ &nbsp;{{ success }}</div>
+      {% endif %}
+
+      {% if error %}
+      <div class="alert alert-error">⚠ &nbsp;{{ error }}</div>
+      {% endif %}
+
+      <form method="POST" action="" id="cat-form">
+        {% csrf_token %}
+
+        <!-- Name -->
+        <div class="form-group">
+          <label class="form-label" for="name">
+            Category Name <span>*</span>
+          </label>
+          <div style="position:relative;">
+            <input
+              type="text"
+              id="name"
+              name="name"
+              class="form-input"
+              placeholder="e.g. Rings, Necklaces, Earrings..."
+              maxlength="100"
+              required
+              oninput="updateCounter(this,'name-count')"
+            />
+            <div class="focus-line"></div>
+          </div>
+          <div class="char-counter"><span id="name-count">0</span> / 100</div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label class="form-label" for="description">Description</label>
+          <div style="position:relative;">
+            <textarea
+              id="description"
+              name="description"
+              class="form-input"
+              placeholder="Brief description of this category..."
+              maxlength="500"
+              oninput="updateCounter(this,'desc-count')"
+            ></textarea>
+            <div class="focus-line"></div>
+          </div>
+          <div class="char-counter"><span id="desc-count">0</span> / 500</div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+          <button type="submit" class="btn-submit">✦ &nbsp;Save Category</button>
+          <button type="reset" class="btn-reset" onclick="resetCounters()">Reset</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function updateCounter(input, countId) {
+    document.getElementById(countId).textContent = input.value.length;
+  }
+
+  function resetCounters() {
+    setTimeout(() => {
+      document.getElementById('name-count').textContent = '0';
+      document.getElementById('desc-count').textContent = '0';
+    }, 10);
+  }
+
+  function vanishAlert(alert) {
+    setTimeout(() => {
+      alert.style.transition = 'opacity 0.8s ease, max-height 0.8s ease, padding 0.8s ease, margin 0.8s ease';
+      alert.style.opacity   = '0';
+      alert.style.maxHeight = '0';
+      alert.style.padding   = '0';
+      alert.style.margin    = '0';
+      alert.style.overflow  = 'hidden';
+    }, 10000);
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+
+    // ── If success → clear form immediately ──────────────
+    const success = document.querySelector('.alert-success');
+    if (success) {
+      document.getElementById('cat-form').reset();
+      document.getElementById('name-count').textContent = '0';
+      document.getElementById('desc-count').textContent = '0';
+      vanishAlert(success);
+    }
+
+    // ── Error → just vanish after 10s, keep form data ────
+    const error = document.querySelector('.alert-error');
+    if (error) {
+      vanishAlert(error);
+    }
+
+  });
+</script>
+
+{% endblock %}
