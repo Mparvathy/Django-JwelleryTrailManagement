@@ -37,7 +37,7 @@ A full-stack **Django** web application for a jewellery e-commerce platform with
 | Backend | Django 5.2 |
 | Database | PostgreSQL |
 | AI / CV | MediaPipe, OpenCV, Pillow |
-| Frontend | HTML, CSS, Vanilla JS |
+| Frontend | HTML, CSS |
 | Auth | Django Custom User Model |
 | Media | Django Media Files |
 
