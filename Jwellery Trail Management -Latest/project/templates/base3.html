@@ -1,0 +1,421 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Tanishq | Jewellery Trail Management</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Poppins:wght@300;400;500&display=swap"
+        rel="stylesheet">
+</head>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Poppins', sans-serif;
+        background: #fdfcf8;
+    }
+
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 60px;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        height: 75px;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+    }
+
+    .logo a {
+        font-family: 'Cinzel', serif;
+        font-size: 28px;
+        font-weight: 700;
+        color: #FFD700;
+        text-decoration: none;
+        letter-spacing: 4px;
+        transition: 0.3s;
+    }
+
+    .logo a:hover {
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+    }
+
+    .nav-links {
+        list-style: none;
+        display: flex;
+        gap: 0;
+        margin: 0;
+        padding: 0;
+        align-items: center;
+        height: 100%;
+    }
+
+    .nav-links li {
+        position: relative;
+        height: 100%;
+        display: flex;
+        align-items: center;
+    }
+
+    .nav-links li a {
+        font-family: 'Poppins', sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        color: rgba(255, 255, 255, 0.8);
+        padding: 0 20px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        position: relative;
+        transition: color 0.3s;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .nav-links li a:hover {
+        color: #FFD700;
+    }
+
+    /* ── nb-dropdown (User Dropdown) ── */
+    .nb-dropdown {
+        position: relative;
+        height: 100%;
+        display: flex;
+        align-items: center;
+    }
+
+    .nb-dropdown-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 20px;
+        height: 100%;
+        color: #FFD700;
+        font-family: 'Poppins', sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        background: none;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s;
+        white-space: nowrap;
+        position: relative;
+        border-left: 1px solid rgba(255, 215, 0, 0.1);
+    }
+
+    .nb-dropdown-toggle:hover,
+    .nb-dropdown-toggle.open {
+        background: rgba(255, 215, 0, 0.05);
+    }
+
+    .nb-arrow {
+        font-size: 9px;
+        transition: transform 0.3s ease;
+        margin-left: 2px;
+    }
+
+    .nb-dropdown-toggle.open .nb-arrow {
+        transform: rotate(180deg);
+    }
+
+    .nb-dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        min-width: 180px;
+        background: rgba(10, 10, 10, 0.8);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 215, 0, 0.15);
+        border-top: 2px solid #FFD700;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(8px);
+        transition: all 0.25s ease;
+        z-index: 1000;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    .nb-dropdown-menu.open {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .nb-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 13px 20px;
+        text-decoration: none;
+        color: rgba(255, 255, 255, 0.5);
+        font-family: 'Poppins', sans-serif;
+        font-size: 13px;
+        transition: all 0.2s;
+        border-bottom: 1px solid rgba(255, 215, 0, 0.06);
+    }
+
+    .nb-menu-item:last-child {
+        border-bottom: none;
+    }
+
+    .nb-menu-item:hover {
+        color: #FFD700;
+        background: rgba(255, 215, 0, 0.05);
+    }
+
+    .nb-menu-item::before {
+        content: '—';
+        font-size: 10px;
+        color: rgba(255, 215, 0, 0.3);
+    }
+
+    .nb-menu-item.active {
+        color: #FFD700;
+    }
+
+
+    /* ── Luxury Page Loader ── */
+    #page-loader {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        z-index: 99999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.5s ease;
+    }
+
+    #page-loader.active {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    .luxury-loader {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .loader-star {
+        font-size: 40px;
+        color: #FFD700;
+        text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+        animation: starPulse 2s infinite ease-in-out;
+        z-index: 2;
+    }
+
+    .loader-rings {
+        position: absolute;
+        inset: 0;
+    }
+
+    .ring {
+        position: absolute;
+        inset: 0;
+        border: 1px solid rgba(255, 215, 0, 0.1);
+        border-radius: 50%;
+    }
+
+    .ring::after {
+        content: '';
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: #FFD700;
+        border-radius: 50%;
+        box-shadow: 0 0 10px #FFD700;
+    }
+
+    .ring-1 {
+        animation: rotate 3s linear infinite;
+        margin: 10px;
+    }
+
+    .ring-1::after {
+        top: -2px;
+        left: 50%;
+    }
+
+    .ring-2 {
+        animation: rotate 4s linear infinite reverse;
+        margin: 30px;
+    }
+
+    .ring-2::after {
+        bottom: -2px;
+        right: 50%;
+    }
+
+    .ring-3 {
+        animation: rotate 5s linear infinite;
+        margin: 50px;
+    }
+
+    .ring-3::after {
+        left: -2px;
+        top: 50%;
+    }
+
+    .loader-text {
+        color: #FFD700;
+        font-family: 'Cinzel', serif;
+        font-size: 11px;
+        letter-spacing: 8px;
+        margin-top: 30px;
+        opacity: 0.8;
+        animation: textFade 2s infinite;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes starPulse {
+        0%, 100% { transform: scale(1); filter: brightness(1); }
+        50% { transform: scale(1.2); filter: brightness(1.5); }
+    }
+
+    @keyframes textFade {
+        0%, 100% { opacity: 0.4; }
+        50% { opacity: 1; }
+    }
+
+    @media (max-width: 992px) {
+        .navbar {
+            padding: 0 20px;
+        }
+
+        .nav-links li a {
+            padding: 0 12px;
+            font-size: 11px;
+        }
+    }
+</style>
+
+<body>
+
+    <div id="page-loader">
+        <div class="luxury-loader">
+            <div class="loader-rings">
+                <div class="ring ring-1"></div>
+                <div class="ring ring-2"></div>
+                <div class="ring ring-3"></div>
+            </div>
+            <div class="loader-star">✦</div>
+        </div>
+        <div class="loader-text">LOADING</div>
+    </div>
+
+    <nav class="navbar">
+        <div class="logo">
+            <a href="{% url 'userdashboard'%}">TANISHQ</a>
+        </div>
+
+        <ul class="nav-links">
+            <li><a href="{% url 'userdashboard' %}">Home</a></li>
+            <li><a href="{% url 'menu' %}">Collection</a></li>
+            <li><a href="{% url 'tryon' %}">Virtual Try-On</a></li>
+            <li><a href="{% url 'wishlist' %}">Wishlist</a></li>
+
+            <li><a href="{% url 'cart' %}">Cart</a></li>
+
+            <li class="nb-item">
+                <div class="nb-dropdown">
+                    <button class="nb-dropdown-toggle" onclick="toggleNav(this)">
+                        <span style="font-size: 16px;">👤</span>
+                        {{ request.user.username }}
+                        <span class="nb-arrow">▼</span>
+                    </button>
+                    <div class="nb-dropdown-menu">
+                        <a href="{% url 'profile' %}" class="nb-menu-item">
+                            My Profile
+                        </a>
+                        <a href="{% url 'my_orders' %}" class="nb-menu-item">
+                            My Orders
+                        </a>
+                        <a href="{% url 'userlogout' %}" class="nb-menu-item">
+                            Logout
+                        </a>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script>
+        var loader = document.getElementById('page-loader');
+
+        // Add click events for all links for loader animation
+        document.querySelectorAll('a:not(.no-loader)').forEach(function (link) {
+            link.addEventListener('click', function (e) {
+                var href = this.getAttribute('href');
+                if (href && href !== '' && href !== '#' && !href.startsWith('javascript:')) {
+                    e.preventDefault();
+                    loader.classList.add('active');
+                    setTimeout(function () { window.location.href = href; }, 800);
+                }
+            });
+        });
+
+        window.addEventListener('pageshow', function () { loader.classList.remove('active'); });
+
+        function toggleNav(btn) {
+            const menu = btn.nextElementSibling;
+            const isOpen = btn.classList.contains('open');
+
+            // Close all open dropdowns
+            document.querySelectorAll('.nb-dropdown-toggle.open').forEach(b => {
+                if (b !== btn) {
+                    b.classList.remove('open');
+                    b.nextElementSibling.classList.remove('open');
+                }
+            });
+
+            // Toggle clicked one
+            if (isOpen) {
+                btn.classList.remove('open');
+                menu.classList.remove('open');
+            } else {
+                btn.classList.add('open');
+                menu.classList.add('open');
+            }
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.nb-dropdown')) {
+                document.querySelectorAll('.nb-dropdown-toggle.open').forEach(b => {
+                    b.classList.remove('open');
+                    b.nextElementSibling.classList.remove('open');
+                });
+            }
+        });
+    </script>
+
+</body>
+
+</html>

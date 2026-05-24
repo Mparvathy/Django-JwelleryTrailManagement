@@ -1,0 +1,417 @@
+{% load static %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Raleway:wght@300;400;500;600&display=swap');
+
+  :root {
+    --gold:      #C9A84C;
+    --gold-dark: #B8860B;
+    --gold-pale: rgba(201,168,76,0.12);
+    --navbar:    #0f0e0b;
+    --border:    rgba(201,168,76,0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ══ NAVBAR ═══════════════════════════════════════════════ */
+  .admin-navbar {
+    width: 100%;
+    background: var(--navbar);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 36px;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+  }
+
+  /* ── Brand ─────────────────────────────── */
+  .nb-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+  }
+  .nb-gem {
+    font-size: 20px;
+    color: var(--gold);
+    animation: gemPulse 3s ease-in-out infinite;
+  }
+  @keyframes gemPulse {
+    0%,100% { transform: scale(1) rotate(0deg);    opacity: 1;  }
+    50%      { transform: scale(1.2) rotate(20deg); opacity: .7; }
+  }
+  .nb-brand h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 4px;
+  }
+  .nb-brand span {
+    font-family: 'Raleway', sans-serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(201,168,76,0.4);
+    margin-left: 2px;
+  }
+
+  /* ── Nav Links ─────────────────────────── */
+  .nb-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    list-style: none;
+    height: 100%;
+  }
+
+  /* Plain item */
+  .nb-item {
+    height: 64px;
+    display: flex;
+    align-items: center;
+  }
+
+  .nb-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 18px;
+    height: 100%;
+    text-decoration: none;
+    color: rgba(255,255,255,0.55);
+    font-family: 'Raleway', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    position: relative;
+    transition: color 0.25s;
+    white-space: nowrap;
+  }
+  .nb-link:hover { color: var(--gold); }
+
+  .nb-link.active { color: var(--gold); }
+
+  /* Gold bottom indicator */
+  .nb-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 18px; right: 18px;
+    height: 2px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transition: transform 0.25s ease;
+  }
+  .nb-link:hover::after,
+  .nb-link.active::after { transform: scaleX(1); }
+
+  .nb-icon { font-size: 14px; }
+
+  /* ── Dropdown ──────────────────────────── */
+  .nb-dropdown {
+    position: relative;
+    height: 64px;
+    display: flex;
+    align-items: center;
+  }
+
+  .nb-dropdown-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 18px;
+    height: 100%;
+    color: rgba(255,255,255,0.55);
+    font-family: 'Raleway', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.25s;
+    white-space: nowrap;
+    position: relative;
+  }
+  .nb-dropdown-toggle:hover,
+  .nb-dropdown-toggle.open { color: var(--gold); }
+
+  .nb-dropdown-toggle::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 18px; right: 18px;
+    height: 2px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transition: transform 0.25s ease;
+  }
+  .nb-dropdown-toggle.open::after { transform: scaleX(1); }
+
+  /* Arrow */
+  .nb-arrow {
+    font-size: 9px;
+    color: rgba(201,168,76,0.5);
+    transition: transform 0.3s ease;
+    margin-left: 2px;
+  }
+  .nb-dropdown-toggle.open .nb-arrow { transform: rotate(180deg); }
+
+  /* Dropdown menu */
+  .nb-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 0px);
+    left: 0;
+    min-width: 200px;
+    background: #1a1810;
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--gold);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+    z-index: 1000;
+  }
+  .nb-dropdown-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .nb-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 20px;
+    text-decoration: none;
+    color: rgba(255,255,255,0.5);
+    font-family: 'Raleway', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    transition: color 0.2s, background 0.2s;
+    border-bottom: 1px solid rgba(201,168,76,0.06);
+    position: relative;
+  }
+  .nb-menu-item:last-child { border-bottom: none; }
+  .nb-menu-item:hover {
+    color: var(--gold);
+    background: var(--gold-pale);
+  }
+  .nb-menu-item::before {
+    content: '—';
+    font-size: 9px;
+    color: rgba(201,168,76,0.3);
+  }
+  .nb-menu-item.active { color: var(--gold); }
+
+  /* ── Right side ────────────────────────── */
+  .nb-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .nb-admin-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .nb-avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--gold-pale);
+    border: 1px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    color: var(--gold);
+  }
+  .nb-admin-name {
+    font-family: 'Raleway', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 0.5px;
+  }
+  .nb-admin-role {
+    font-family: 'Raleway', sans-serif;
+    font-size: 10px;
+    color: rgba(201,168,76,0.45);
+    letter-spacing: 1px;
+    display: block;
+  }
+
+  .nb-divider {
+    width: 1px;
+    height: 28px;
+    background: var(--border);
+  }
+
+  .nb-logout {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    text-decoration: none;
+    transition: color 0.2s;
+    background: none;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .nb-logout:hover { color: #e05555; }
+
+  /* ══ RESPONSIVE ═══════════════════════════ */
+  @media (max-width: 900px) {
+    .admin-navbar { padding: 0 16px; }
+    .nb-link, .nb-dropdown-toggle { padding: 0 12px; font-size: 13px; }
+    .nb-admin-name, .nb-admin-role, .nb-divider { display: none; }
+  }
+  @media (max-width: 640px) {
+    .nb-brand span { display: none; }
+    .nb-links { gap: 0; }
+    .nb-link, .nb-dropdown-toggle { padding: 0 10px; font-size: 12px; }
+  }
+</style>
+
+<nav class="admin-navbar">
+
+  <!-- Brand -->
+  <a href="{% url 'admindashboard' %}" class="nb-brand">
+    <span class="nb-gem">✦</span>
+    <h2>TANISHQ</h2>
+    <span>Admin</span>
+  </a>
+
+  <!-- Nav Links -->
+  <ul class="nb-links">
+
+    <!-- Dashboard -->
+    <li class="nb-item">
+      <a href="{% url 'admindashboard' %}"
+         class="nb-link {% if request.resolver_match.url_name == 'admindashboard' %}active{% endif %}">
+        <span class="nb-icon">⬡</span>
+        Dashboard
+      </a>
+    </li>
+
+    <!-- Products Dropdown -->
+    <li class="nb-item">
+      <div class="nb-dropdown">
+        <button class="nb-dropdown-toggle
+          {% if request.resolver_match.url_name in 'admin_add_product,admin_manage_products' %}open{% endif %}"
+          onclick="toggleNav(this)">
+          <span class="nb-icon">◈</span>
+          Products
+          <span class="nb-arrow">▼</span>
+        </button>
+        <div class="nb-dropdown-menu
+          {% if request.resolver_match.url_name in 'admin_add_product,admin_manage_products' %}open{% endif %}">
+          <a href="{% url 'admin_add_product' %}"
+             class="nb-menu-item {% if request.resolver_match.url_name == 'admin_add_product' %}active{% endif %}">
+            Add Product
+          </a>
+          <a href="{% url 'admin_manage_products' %}"
+             class="nb-menu-item {% if request.resolver_match.url_name == 'admin_manage_products' %}active{% endif %}">
+            Manage Products
+          </a>
+        </div>
+      </div>
+    </li>
+
+    <li class="nb-item">
+      <div class="nb-dropdown">
+        <button class="nb-dropdown-toggle
+          {% if request.resolver_match.url_name in 'admin_add_category,admin_manage_categories' %}open{% endif %}"
+          onclick="toggleNav(this)">
+          <span class="nb-icon">◻</span>
+          Categories
+          <span class="nb-arrow">▼</span>
+        </button>
+        <div class="nb-dropdown-menu
+          {% if request.resolver_match.url_name in 'admin_add_category,admin_manage_categories' %}open{% endif %}">
+          <a href="{% url 'admin_add_category' %}"
+             class="nb-menu-item {% if request.resolver_match.url_name == 'admin_add_category' %}active{% endif %}">
+            Add Category
+          </a>
+          <a href="{% url 'admin_manage_categories' %}"
+             class="nb-menu-item {% if request.resolver_match.url_name == 'admin_manage_categories' %}active{% endif %}">
+            Manage Categories
+          </a>
+        </div>
+      </div>
+    </li>
+
+    <li class="nb-item">
+      <a href="{% url 'admin_orders' %}"
+         class="nb-link {% if request.resolver_match.url_name == 'admin_orders' %}active{% endif %}">
+        <span class="nb-icon">📋</span>
+        Orders
+      </a>
+    </li>
+
+    <!-- Registered Users -->
+    <li class="nb-item">
+      <a href="{% url 'admin_users' %}"
+         class="nb-link {% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}">
+        <span class="nb-icon">◉</span>
+        Users
+      </a>
+    </li>
+
+  </ul>
+
+  <!-- Right: Admin info + Logout -->
+  <div class="nb-right">
+    <div class="nb-admin-info">
+      <div class="nb-avatar">A</div>
+      <div>
+        <div class="nb-admin-name">Admin</div>
+        <span class="nb-admin-role">Super User</span>
+      </div>
+    </div>
+    <div class="nb-divider"></div>
+    <a href="{% url 'adminlogout' %}" class="nb-logout">
+      <span>⏻</span>
+      <span>Logout</span>
+    </a>
+  </div>
+
+</nav>
+{% block content %}
+
+{% endblock %}
+<script>
+  function toggleNav(btn) {
+    const menu   = btn.nextElementSibling;
+    const isOpen = btn.classList.contains('open');
+    document.querySelectorAll('.nb-dropdown-toggle.open').forEach(b => {
+      b.classList.remove('open');
+      b.nextElementSibling.classList.remove('open');
+    });
+
+    // Open clicked one if it was closed
+    if (!isOpen) {
+      btn.classList.add('open');
+      menu.classList.add('open');
+    }
+  }
+
+  // Close dropdowns when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.nb-dropdown')) {
+      document.querySelectorAll('.nb-dropdown-toggle.open').forEach(b => {
+        b.classList.remove('open');
+        b.nextElementSibling.classList.remove('open');
+      });
+    }
+  });
+</script>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .email-container {
+            font-family: 'Poppins', Arial, sans-serif;
+            max-width: 640px;
+            margin: 0 auto;
+            border: 1px solid #eee;
+            background: #fff;
+        }
+        .header {
+            background: #111;
+            color: #d4af37;
+            text-align: center;
+            padding: 24px;
+            font-size: 26px;
+            letter-spacing: 4px;
+        }
+        .content {
+            padding: 28px;
+            color: #333;
+            line-height: 1.6;
+        }
+        .status-box {
+            margin: 20px 0;
+            padding: 18px;
+            background: #faf7f1;
+            border-left: 4px solid #d4af37;
+        }
+        .comment-box {
+            margin-top: 18px;
+            padding: 14px 16px;
+            background: #fffdfa;
+            border: 1px solid #eadfca;
+        }
+        .footer {
+            padding: 0 28px 28px;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">TANISHQ</div>
+        <div class="content">
+            <h3>Hello {{ user.first_name|default:user.username }},</h3>
+            <p>Your order status has been updated.</p>
+
+            <div class="status-box">
+                <p><strong>Order No:</strong> ORD-{{ order.id }}</p>
+                <p><strong>Current Status:</strong> {{ order.status }}</p>
+                <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+                <p><strong>Total Amount:</strong> Rs. {{ order.total_amount }}</p>
+            </div>
+
+            {% if order.admin_comment %}
+            <div class="comment-box">
+                <strong>Admin Comment</strong><br>
+                {{ order.admin_comment|linebreaksbr }}
+            </div>
+            {% endif %}
+
+            <p style="margin-top: 22px;">We will continue to keep you informed as your order moves forward.</p>
+        </div>
+        <div class="footer">
+            Thank you for shopping with us.<br>
+            The Tanishq Team
+        </div>
+    </div>
+</body>
+</html>

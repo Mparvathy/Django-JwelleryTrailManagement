@@ -1,0 +1,492 @@
+{% extends 'base3.html' %}
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400&family=Cinzel:wght@400;500;600&family=Jost:wght@200;300;400;500&display=swap');
+
+  :root {
+    --gold: #b8922a;
+    --gold-light: #d4aa50;
+    --ivory: #fdfaf5;
+    --text: #1a1410;
+    --border: rgba(184, 146, 42, 0.15);
+  }
+
+  .checkout-container {
+    max-width: 1200px;
+    margin: 60px auto;
+    padding: 0 5vw;
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 60px;
+  }
+
+  .checkout-title {
+    grid-column: 1 / -1;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Cinzel', serif;
+    font-size: 32px;
+    letter-spacing: 2px;
+    color: var(--text);
+  }
+
+  .section-title {
+    margin-bottom: 24px;
+    font-family: 'Bodoni Moda', serif;
+    font-size: 22px;
+    color: var(--text);
+  }
+
+  .checkout-main {
+    display: flex;
+    flex-direction: column;
+    gap: 34px;
+  }
+
+  .checkout-section {
+    padding: 30px;
+    border: 1px solid var(--border);
+    background: white;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+  }
+
+  .checkout-error {
+    margin-bottom: 18px;
+    padding: 14px 16px;
+    background: #fff4f1;
+    border: 1px solid rgba(180, 60, 40, 0.18);
+    color: #9f3d2e;
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+  }
+
+  .shipping-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .field-group.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .field-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #7a6a57;
+  }
+
+  .field-input,
+  .field-textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid rgba(26, 20, 16, 0.15);
+    background: #fffdf9;
+    outline: none;
+    font-family: 'Jost', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+  }
+
+  .field-textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .field-input:focus,
+  .field-textarea:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(184, 146, 42, 0.12);
+  }
+
+  .section-note {
+    margin: -10px 0 20px;
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    color: #7a6a57;
+  }
+
+  .payment-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .payment-option {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .payment-option:hover {
+    border-color: var(--gold);
+    background: var(--ivory);
+  }
+
+  .payment-option input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--gold);
+  }
+
+  .payment-option label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-grow: 1;
+    cursor: pointer;
+    font-family: 'Jost', sans-serif;
+    font-size: 16px;
+    color: var(--text);
+  }
+
+  .payment-icon {
+    font-size: 24px;
+    color: var(--gold);
+  }
+
+  .upi-panel {
+    display: none;
+    margin-top: 18px;
+    padding: 22px;
+    border: 1px solid var(--border);
+    background: linear-gradient(180deg, #fffdf8 0%, #f8f1e6 100%);
+  }
+
+  .upi-panel.active {
+    display: block;
+  }
+
+  .upi-label {
+    display: block;
+    margin-bottom: 10px;
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  .upi-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid rgba(26, 20, 16, 0.15);
+    background: white;
+    outline: none;
+    font-family: 'Jost', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+  }
+
+  .upi-input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(184, 146, 42, 0.12);
+  }
+
+  .upi-help {
+    margin-top: 10px;
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #7a6a57;
+  }
+
+  .order-summary {
+    position: sticky;
+    top: 40px;
+    padding: 40px;
+    border: 1px solid var(--border);
+    background: white;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+  }
+
+  .summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  .summary-total {
+    margin-top: 25px;
+    padding-top: 25px;
+    border-top: 1px solid var(--border);
+    font-family: 'Bodoni Moda', serif;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .btn-pay {
+    width: 100%;
+    margin-top: 30px;
+    padding: 18px;
+    border: none;
+    background: var(--text);
+    color: var(--ivory);
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 3px;
+  }
+
+  .btn-pay:hover {
+    background: var(--gold);
+    transform: translateY(-2px);
+  }
+
+  .dummy-processing {
+    display: none;
+    margin-top: 14px;
+    text-align: center;
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: #7a6a57;
+  }
+
+  .dummy-processing.show {
+    display: block;
+  }
+
+  @media (max-width: 900px) {
+    .checkout-container {
+      grid-template-columns: 1fr;
+    }
+
+    .order-summary {
+      position: static;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .shipping-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .checkout-section {
+      padding: 22px 20px;
+    }
+  }
+</style>
+
+<div class="checkout-container">
+  <h1 class="checkout-title">Secure Checkout</h1>
+
+  <form id="payment-form" method="POST" action="{% url 'process_payment' %}">
+    <div class="checkout-main">
+      {% csrf_token %}
+
+      <div class="checkout-section">
+        <div class="section-title">Shipping Details</div>
+        <div class="section-note">Add delivery address and contact details before choosing the payment mode.</div>
+
+        {% if checkout_error %}
+        <div class="checkout-error">{{ checkout_error }}</div>
+        {% endif %}
+
+        <div class="shipping-grid">
+          <div class="field-group full-width">
+            <label for="shipping-address">Shipping Address</label>
+            <textarea
+              id="shipping-address"
+              name="shipping_address"
+              class="field-textarea"
+              placeholder="House name, street, area"
+              required
+            >{{ entered_shipping_address|default:'' }}</textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="city">City</label>
+            <input
+              type="text"
+              id="city"
+              name="city"
+              class="field-input"
+              value="{{ entered_city|default:'' }}"
+              placeholder="Enter city"
+              required
+            >
+          </div>
+
+          <div class="field-group">
+            <label for="state">State</label>
+            <input
+              type="text"
+              id="state"
+              name="state"
+              class="field-input"
+              value="{{ entered_state|default:'' }}"
+              placeholder="Enter state"
+              required
+            >
+          </div>
+
+          <div class="field-group">
+            <label for="pincode">Pincode</label>
+            <input
+              type="text"
+              id="pincode"
+              name="pincode"
+              class="field-input"
+              value="{{ entered_pincode|default:'' }}"
+              placeholder="6-digit pincode"
+              inputmode="numeric"
+              maxlength="6"
+              required
+            >
+          </div>
+
+          <div class="field-group">
+            <label for="phone-number">Phone Number</label>
+            <input
+              type="text"
+              id="phone-number"
+              name="phone_number"
+              class="field-input"
+              value="{{ entered_phone_number|default:'' }}"
+              placeholder="Enter phone number"
+              inputmode="tel"
+              maxlength="15"
+              required
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="checkout-section">
+        <div class="section-title">Select Payment Method</div>
+
+        <div class="payment-methods">
+          <div class="payment-option">
+            <input type="radio" name="payment_method" value="UPI" id="upi" {% if selected_payment_method|default:'UPI' == 'UPI' %}checked{% endif %}>
+            <label for="upi">
+              <span>UPI (PhonePe, Google Pay, BHIM)</span>
+              <span class="payment-icon">UPI</span>
+            </label>
+          </div>
+
+          <div class="payment-option">
+            <input type="radio" name="payment_method" value="CARD" id="card" {% if selected_payment_method == 'CARD' %}checked{% endif %}>
+            <label for="card">
+              <span>Credit / Debit Card</span>
+              <span class="payment-icon">Card</span>
+            </label>
+          </div>
+
+          <div class="payment-option">
+            <input type="radio" name="payment_method" value="COD" id="cod" {% if selected_payment_method == 'COD' %}checked{% endif %}>
+            <label for="cod">
+              <span>Cash on Delivery</span>
+              <span class="payment-icon">COD</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="upi-panel" class="upi-panel {% if selected_payment_method|default:'UPI' == 'UPI' %}active{% endif %}">
+          <label class="upi-label" for="upi-id">Enter UPI ID</label>
+          <input
+            type="text"
+            id="upi-id"
+            name="upi_id"
+            class="upi-input"
+            value="{{ entered_upi_id|default:'' }}"
+            placeholder="yourname@bank"
+            autocomplete="off"
+            {% if selected_payment_method|default:'UPI' != 'UPI' %}disabled{% endif %}
+          >
+          <div class="upi-help">
+            Demo payment only. Enter any valid-looking UPI ID such as <strong>demo@upi</strong> and we will simulate a successful payment.
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div class="order-summary">
+    <div class="section-title" style="font-size: 18px; border-bottom: 1px solid var(--border); padding-bottom: 15px;">Order Summary</div>
+
+    {% for item in cart_items %}
+    <div class="summary-item">
+      <span>{{ item.product.name }} (x{{ item.quantity }})</span>
+      <span>Rs. {{ item.subtotal }}</span>
+    </div>
+    {% endfor %}
+
+    <div class="summary-item" style="margin-top: 20px; color: var(--gold-light);">
+      <span>Shipping</span>
+      <span>Free</span>
+    </div>
+
+    <div class="summary-item summary-total">
+      <span>Grand Total</span>
+      <span>Rs. {{ total }}</span>
+    </div>
+
+    <button type="submit" form="payment-form" class="btn-pay">Place Order</button>
+    <div id="dummy-processing" class="dummy-processing">Processing demo payment securely...</div>
+    <p style="margin-top: 15px; text-align: center; font-family: 'Jost', sans-serif; font-size: 10px; color: #888;">
+      Demo checkout with simulated confirmation
+    </p>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const form = document.getElementById('payment-form');
+    const paymentRadios = document.querySelectorAll('input[name="payment_method"]');
+    const upiPanel = document.getElementById('upi-panel');
+    const upiInput = document.getElementById('upi-id');
+    const processingNote = document.getElementById('dummy-processing');
+
+    function syncUpiPanel() {
+      const selected = document.querySelector('input[name="payment_method"]:checked');
+      const isUpi = selected && selected.value === 'UPI';
+      upiPanel.classList.toggle('active', isUpi);
+      upiInput.disabled = !isUpi;
+
+      if (!isUpi) {
+        processingNote.classList.remove('show');
+      }
+    }
+
+    paymentRadios.forEach((radio) => {
+      radio.addEventListener('change', syncUpiPanel);
+    });
+
+    form.addEventListener('submit', function (event) {
+      const selected = document.querySelector('input[name="payment_method"]:checked');
+      if (!selected || selected.value !== 'UPI') {
+        return;
+      }
+
+      if (!upiInput.value.trim()) {
+        event.preventDefault();
+        upiInput.focus();
+        return;
+      }
+
+      event.preventDefault();
+      processingNote.classList.add('show');
+
+      window.setTimeout(function () {
+        form.submit();
+      }, 1200);
+    });
+
+    syncUpiPanel();
+  })();
+</script>
+{% endblock %}

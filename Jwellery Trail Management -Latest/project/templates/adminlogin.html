@@ -1,0 +1,411 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Raleway:wght@300;400;500&display=swap');
+
+  :root {
+    --gold: #C9A84C;
+    --gold-dark: #B8860B;
+    --gold-light: #E8CC7A;
+    --ivory: #faf6f0;
+    --cream: #f2ebe0;
+    --text-dark: #2c2416;
+    --muted: #7a6e60;
+    --border: rgba(201,168,76,0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .admin-page {
+    min-height: 100vh;
+    background: var(--ivory);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding: 40px 20px;
+  }
+
+  /* ── DECORATIVE BACKGROUND ──────────────────────────────── */
+  .admin-page::before {
+    content: 'TANISHQ';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Cinzel', serif;
+    font-size: clamp(60px, 14vw, 180px);
+    letter-spacing: 20px;
+    color: rgba(201,168,76,0.05);
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Corner ornaments */
+  .admin-page::after {
+    content: '';
+    position: absolute;
+    inset: 20px;
+    border: 1px solid rgba(201,168,76,0.1);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Gold corner accents */
+  .corner {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .corner-tl { top: 28px; left: 28px; border-top: 2px solid var(--gold); border-left: 2px solid var(--gold); opacity: 0.4; }
+  .corner-tr { top: 28px; right: 28px; border-top: 2px solid var(--gold); border-right: 2px solid var(--gold); opacity: 0.4; }
+  .corner-bl { bottom: 28px; left: 28px; border-bottom: 2px solid var(--gold); border-left: 2px solid var(--gold); opacity: 0.4; }
+  .corner-br { bottom: 28px; right: 28px; border-bottom: 2px solid var(--gold); border-right: 2px solid var(--gold); opacity: 0.4; }
+
+  /* ── LOGIN CARD ─────────────────────────────────────────── */
+  .login-card {
+    position: relative;
+    z-index: 2;
+    background: white;
+    border: 1px solid var(--border);
+    padding: 60px 56px;
+    width: 100%;
+    max-width: 460px;
+    box-shadow: 0 20px 60px rgba(184,134,11,0.08), 0 4px 20px rgba(0,0,0,0.06);
+    animation: cardReveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  @keyframes cardReveal {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Gold top bar */
+  .login-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  /* ── HEADER ─────────────────────────────────────────────── */
+  .login-header {
+    text-align: center;
+    margin-bottom: 44px;
+  }
+
+  .login-diamond {
+    font-size: 28px;
+    color: var(--gold);
+    display: block;
+    margin-bottom: 16px;
+    animation: diamondSpin 6s linear infinite;
+  }
+
+  @keyframes diamondSpin {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25%       { transform: rotate(10deg) scale(1.1); }
+    75%       { transform: rotate(-10deg) scale(1.1); }
+  }
+
+  .login-eyebrow {
+    font-family: 'Raleway', sans-serif;
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .login-eyebrow::before,
+  .login-eyebrow::after {
+    content: '';
+    display: block;
+    width: 30px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.5;
+  }
+
+  .login-header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text-dark);
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+
+  .login-header p {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+
+  /* ── FORM ───────────────────────────────────────────────── */
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .field-group {
+    position: relative;
+  }
+
+  .field-group label {
+    font-family: 'Raleway', sans-serif;
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold-dark);
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .field-group input {
+    width: 100%;
+    padding: 14px 16px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 14px;
+    color: var(--text-dark);
+    background: var(--ivory);
+    border: 1px solid rgba(201,168,76,0.2);
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+    letter-spacing: 1px;
+  }
+
+  .field-group input::placeholder {
+    color: rgba(122,110,96,0.5);
+    font-style: italic;
+    letter-spacing: 0.5px;
+  }
+
+  .field-group input:focus {
+    border-color: var(--gold);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.08);
+  }
+
+  /* Animated bottom gold line on focus */
+  .field-line {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    transition: width 0.4s ease;
+  }
+
+  .field-group input:focus ~ .field-line {
+    width: 100%;
+  }
+
+  /* Password toggle icon */
+  .field-wrap {
+    position: relative;
+  }
+
+  .toggle-pw {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 14px;
+    user-select: none;
+    transition: color 0.2s;
+  }
+
+  .toggle-pw:hover { color: var(--gold); }
+
+  /* ── LOGIN BUTTON ───────────────────────────────────────── */
+  .login-btn {
+    margin-top: 8px;
+    width: 100%;
+    padding: 16px;
+    background: var(--text-dark);
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    border: 1px solid var(--text-dark);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s, color 0.3s, border-color 0.3s;
+  }
+
+  .login-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(201,168,76,0.15) 50%, transparent 100%);
+    transform: translateX(-100%);
+    transition: transform 0.5s ease;
+  }
+
+  .login-btn:hover::before {
+    transform: translateX(100%);
+  }
+
+  .login-btn:hover {
+    background: var(--gold-dark);
+    border-color: var(--gold-dark);
+    color: white;
+  }
+
+  .login-btn:active {
+    transform: scale(0.99);
+  }
+
+  /* ── ERROR MESSAGE ──────────────────────────────────────── */
+  .login-error {
+    background: #fff5f5;
+    border: 1px solid rgba(220,80,80,0.25);
+    border-left: 3px solid #dc5050;
+    padding: 12px 16px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 13px;
+    color: #b03030;
+    letter-spacing: 0.3px;
+  }
+
+  /* ── FOOTER ─────────────────────────────────────────────── */
+  .login-footer {
+    text-align: center;
+    margin-top: 32px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+  }
+
+  .login-footer p {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+
+  .login-footer span {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    font-style: normal;
+  }
+
+  /* ── RESPONSIVE ─────────────────────────────────────────── */
+  @media (max-width: 520px) {
+    .login-card {
+      padding: 44px 28px;
+    }
+    .corner { display: none; }
+  }
+</style>
+
+<div class="admin-page">
+
+  <!-- Corner ornaments -->
+  <div class="corner corner-tl"></div>
+  <div class="corner corner-tr"></div>
+  <div class="corner corner-bl"></div>
+  <div class="corner corner-br"></div>
+
+  <div class="login-card">
+
+    <!-- Header -->
+    <div class="login-header">
+      <span class="login-diamond">✦</span>
+      <div class="login-eyebrow">Secure Access</div>
+      <h1>Admin Portal</h1>
+      <p>Sign in to manage Tanishq</p>
+    </div>
+
+    <!-- Error messages (Django) -->
+    {% if error %}
+    <div class="login-error">
+      ⚠ &nbsp;{{ error }}
+    </div>
+    {% endif %}
+
+    <!-- Form -->
+    <form method="POST" action="" class="login-form">
+      {% csrf_token %}
+
+      <div class="field-group">
+        <label for="username">Username</label>
+        <div class="field-wrap">
+          <input
+            type="text"
+            id="username"
+            name="username"
+            placeholder="Enter your username"
+            autocomplete="off"
+            required
+          />
+          <div class="field-line"></div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="password">Password</label>
+        <div class="field-wrap">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter your password"
+            required
+          />
+          <span class="toggle-pw" onclick="togglePassword()">👁</span>
+          <div class="field-line"></div>
+        </div>
+      </div>
+
+      <button type="submit" class="login-btn">Enter &nbsp;✦</button>
+
+    </form>
+
+    <!-- Footer -->
+    <div class="login-footer">
+      <p>Protected area &nbsp;·&nbsp; <span>TANISHQ</span></p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function togglePassword() {
+    const pw = document.getElementById('password');
+    const icon = document.querySelector('.toggle-pw');
+    if (pw.type === 'password') {
+      pw.type = 'text';
+      icon.style.color = '#C9A84C';
+    } else {
+      pw.type = 'password';
+      icon.style.color = '';
+    }
+  }
+</script>
+
+{% endblock %}

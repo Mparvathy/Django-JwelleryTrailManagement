@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400&family=Great+Vibes&family=Jost:wght@200;300;400;500&display=swap');
+
+  :root {
+    --gold: #B8922A;
+    --gold-light: #D4AA50;
+    --ivory: #FDFAF5;
+    --cream: #F5EFE3;
+    --sand: #EDE3D0;
+    --text: #1A1410;
+    --text-mid: #4A3F32;
+    --text-soft: #8A7A68;
+    --border: rgba(184,146,42,0.15);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--ivory); }
+
+  .page-header {
+    background: var(--text);
+    padding: 60px 8vw 50px;
+    text-align: center;
+  }
+  .page-header-tag {
+    font-family: 'Jost', sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 14px;
+  }
+  .page-header-title {
+    font-family: 'Bodoni Moda', serif;
+    font-size: clamp(32px, 5vw, 60px);
+    font-weight: 400;
+    color: #fff;
+    letter-spacing: 3px;
+  }
+  .page-header-title em { font-family: 'Great Vibes', cursive; font-size: 1.2em; font-style: normal; color: var(--gold-light); }
+
+  .breadcrumb {
+    padding: 16px 8vw;
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+    font-family: 'Jost', sans-serif;
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--text-soft);
+    letter-spacing: 1px;
+  }
+  .breadcrumb a { color: var(--gold); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+
+  .products-section {
+    padding: 60px 8vw 80px;
+  }
+
+  .products-count {
+    font-family: 'Jost', sans-serif;
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--text-soft);
+    letter-spacing: 2px;
+    margin-bottom: 36px;
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+
+  .product-card {
+    background: var(--sand);
+    overflow: hidden;
+    text-decoration: none;
+    display: block;
+    transition: box-shadow 0.3s;
+  }
+  .product-card:hover { box-shadow: 0 12px 40px rgba(26,20,16,0.1); }
+
+  .product-img-wrap {
+    overflow: hidden;
+    height: 320px;
+    background: var(--cream);
+  }
+  .product-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #ffffff;
+    padding: 20px;
+    display: block;
+    transition: transform 0.6s ease;
+  }
+  .product-card:hover .product-img-wrap img { transform: scale(1.05); }
+
+  .product-info {
+    padding: 20px 18px 22px;
+  }
+  .product-name {
+    font-family: 'Bodoni Moda', serif;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+  }
+  .product-price {
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gold);
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+  }
+  .product-tryon-btn {
+    display: inline-block;
+    padding: 9px 20px;
+    background: var(--text);
+    color: var(--ivory);
+    font-family: 'Jost', sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.25s;
+  }
+  .product-tryon-btn:hover { background: var(--gold); }
+
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--text-soft);
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 1px;
+  }
+
+  @media (max-width: 1100px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 768px)  { .products-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px)  { .products-grid { grid-template-columns: 1fr; } }
+</style>
+
+<div class="page-header">
+  <div class="page-header-tag">Fine Jewelry</div>
+  <h1 class="page-header-title"><em>{{ category.name }}</em></h1>
+</div>
+
+<div class="breadcrumb">
+  <a href="{% url 'home' %}">Home</a> &nbsp;/&nbsp; {{ category.name }}
+</div>
+
+<div class="products-section">
+  {% if products %}
+    <div class="products-count">{{ products.count }} piece{{ products.count|pluralize }} found</div>
+    <div class="products-grid">
+      {% for product in products %}
+        <div class="product-card">
+          <div class="product-img-wrap">
+            {% if product.image %}
+              <img src="{{ product.image.url }}" alt="{{ product.name }}" />
+            {% else %}
+              <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=500&q=80&auto=format&fit=crop" alt="{{ product.name }}" />
+            {% endif %}
+          </div>
+          <div class="product-info">
+            <div class="product-name">{{ product.name }}</div>
+            <div class="product-price">₹{{ product.price }}</div>
+            <a href="{% url 'tryon' %}?product={{ product.id }}" class="product-tryon-btn">✦ &nbsp;Try On</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">No products available in this category yet.</div>
+  {% endif %}
+</div>
+{% endblock %}

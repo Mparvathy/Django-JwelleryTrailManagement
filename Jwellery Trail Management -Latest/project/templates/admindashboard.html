@@ -1,0 +1,331 @@
+{% extends 'base1.html' %}
+{% load static %}
+
+{% block content %}
+<div class="dashboard-container">
+    {{ category_labels|json_script:"categoryLabels" }}
+    {{ category_counts|json_script:"categoryCounts" }}
+    {{ stock_status_labels|json_script:"stockStatusLabels" }}
+    {{ stock_status_counts|json_script:"stockStatusCounts" }}
+    {{ engagement_labels|json_script:"engagementLabels" }}
+    {{ engagement_counts|json_script:"engagementCounts" }}
+    <header class="dashboard-header">
+        <div class="header-content">
+            <h1>Admin Dashboard</h1>
+            <p>Welcome back, Admin. Here's what's happening today.</p>
+        </div>
+        <div class="header-date">
+            <span id="currentDate"></span>
+        </div>
+    </header>
+
+    <!-- Stats Overview -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon users">◉</div>
+            <div class="stat-details">
+                <h3>{{ total_users }}</h3>
+                <p>Total Users</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon products">◈</div>
+            <div class="stat-details">
+                <h3>{{ total_products }}</h3>
+                <p>Total Products</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon categories">◻</div>
+            <div class="stat-details">
+                <h3>{{ total_categories }}</h3>
+                <p>Total Categories</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon active-p">✦</div>
+            <div class="stat-details">
+                <h3>{{ active_products }}</h3>
+                <p>Active Products</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-grid">
+        <div class="chart-container main-chart">
+            <h3>Products per Category</h3>
+            <canvas id="categoryChart"></canvas>
+        </div>
+        <div class="chart-container side-chart">
+            <h3>Product Availability</h3>
+            <canvas id="stockChart"></canvas>
+        </div>
+        <div class="chart-container side-chart">
+            <h3>User Engagement</h3>
+            <canvas id="engagementChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .dashboard-container {
+        padding: 30px;
+        background: #0a0a0a;
+        min-height: calc(100vh - 64px);
+        color: #fff;
+        font-family: 'Raleway', sans-serif;
+    }
+
+    /* Header */
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 40px;
+        border-bottom: 1px solid rgba(201,168,76,0.1);
+        padding-bottom: 20px;
+    }
+    .dashboard-header h1 {
+        font-family: 'Cinzel', serif;
+        color: var(--gold);
+        letter-spacing: 2px;
+        font-size: 28px;
+        margin-bottom: 5px;
+    }
+    .dashboard-header p {
+        color: rgba(255,255,255,0.5);
+        font-size: 14px;
+    }
+    .header-date {
+        color: var(--gold);
+        font-size: 14px;
+        letter-spacing: 1px;
+        font-weight: 500;
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+    .stat-card {
+        background: #121212;
+        border: 1px solid rgba(201,168,76,0.15);
+        padding: 25px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--gold);
+    }
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        background: rgba(201,168,76,0.1);
+        color: var(--gold);
+    }
+    .stat-details h3 {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+    .stat-details p {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: rgba(255,255,255,0.4);
+    }
+
+    /* Charts */
+    .charts-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+    .chart-container {
+        background: #121212;
+        border: 1px solid rgba(201,168,76,0.1);
+        padding: 25px;
+        border-radius: 4px;
+    }
+    .chart-container h3 {
+        font-family: 'Cinzel', serif;
+        font-size: 16px;
+        color: var(--gold);
+        margin-bottom: 20px;
+        letter-spacing: 1px;
+    }
+    canvas {
+        max-width: 100%;
+    }
+
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+        .charts-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+        .main-chart {
+            grid-column: span 2;
+        }
+    }
+    @media (max-width: 768px) {
+        .charts-grid {
+            grid-template-columns: 1fr;
+        }
+        .main-chart {
+            grid-column: span 1;
+        }
+        .dashboard-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Set Current Date
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', options);
+
+    // Common Chart Options
+    const chartOptions = {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.05)'
+                },
+                ticks: {
+                    color: 'rgba(255, 255, 255, 0.5)'
+                }
+            },
+            x: {
+                grid: {
+                    display: false
+                },
+                ticks: {
+                    color: 'rgba(255, 255, 255, 0.5)'
+                }
+            }
+        }
+    };
+
+    // Category Chart
+    const categoryLabels = JSON.parse(document.getElementById('categoryLabels').textContent);
+    const categoryCounts = JSON.parse(document.getElementById('categoryCounts').textContent);
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(categoryCtx, {
+        type: 'bar',
+        data: {
+            labels: categoryLabels,
+            datasets: [{
+                label: 'Products',
+                data: categoryCounts,
+                backgroundColor: 'rgba(201, 168, 76, 0.6)',
+                borderColor: 'rgba(201, 168, 76, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: chartOptions
+    });
+
+    // Stock Chart
+    const stockStatusLabels = JSON.parse(document.getElementById('stockStatusLabels').textContent);
+    const stockStatusCounts = JSON.parse(document.getElementById('stockStatusCounts').textContent);
+    const stockCtx = document.getElementById('stockChart').getContext('2d');
+    new Chart(stockCtx, {
+        type: 'doughnut',
+        data: {
+            labels: stockStatusLabels,
+            datasets: [{
+                data: stockStatusCounts,
+                backgroundColor: [
+                    'rgba(46, 204, 113, 0.6)',
+                    'rgba(231, 76, 60, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(46, 204, 113, 1)',
+                    'rgba(231, 76, 60, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        padding: 20
+                    }
+                }
+            }
+        }
+    });
+
+    // Engagement Chart
+    const engagementLabels = JSON.parse(document.getElementById('engagementLabels').textContent);
+    const engagementCounts = JSON.parse(document.getElementById('engagementCounts').textContent);
+    const engagementCtx = document.getElementById('engagementChart').getContext('2d');
+    new Chart(engagementCtx, {
+        type: 'polarArea',
+        data: {
+            labels: engagementLabels,
+            datasets: [{
+                data: engagementCounts,
+                backgroundColor: [
+                    'rgba(201, 168, 76, 0.6)',
+                    'rgba(52, 152, 219, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(201, 168, 76, 1)',
+                    'rgba(52, 152, 219, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        padding: 20
+                    }
+                }
+            },
+            scales: {
+                r: {
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: { display: false }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

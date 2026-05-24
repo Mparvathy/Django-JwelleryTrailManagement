@@ -1,0 +1,161 @@
+{% extends 'base3.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .profile-container {
+        max-width: 800px;
+        margin: 60px auto;
+        padding: 40px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        border: 1px solid rgba(201,168,76,0.1);
+    }
+
+    .profile-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .profile-header h1 {
+        font-family: 'Cinzel', serif;
+        font-size: 32px;
+        color: #1a1a1a;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+    }
+
+    .profile-header p {
+        color: #666;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .profile-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-group.full-width {
+        grid-column: span 2;
+    }
+
+    .form-group label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #B8860B;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .form-group input {
+        padding: 12px 16px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        font-family: 'Poppins', sans-serif;
+        font-size: 14px;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #C9A84C;
+        box-shadow: 0 0 0 4px rgba(201,168,76,0.05);
+    }
+
+    .btn-save {
+        grid-column: span 2;
+        margin-top: 20px;
+        padding: 14px;
+        background: #1a1a1a;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-family: 'Cinzel', serif;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.2s;
+    }
+
+    .btn-save:hover {
+        background: #C9A84C;
+        transform: translateY(-2px);
+    }
+
+    .success-msg {
+        grid-column: span 2;
+        padding: 15px;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        color: #166534;
+        border-radius: 6px;
+        text-align: center;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 640px) {
+        .profile-form {
+            grid-template-columns: 1fr;
+        }
+        .form-group.full-width {
+            grid-column: span 1;
+        }
+        .btn-save {
+            grid-column: span 1;
+        }
+    }
+</style>
+
+<div class="profile-container">
+    <div class="profile-header">
+        <h1>My Profile</h1>
+        <p>Manage your account details and preferences</p>
+    </div>
+
+    {% if success %}
+    <div class="success-msg">
+        {{ success }}
+    </div>
+    {% endif %}
+
+    <form class="profile-form" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="first_name">First Name</label>
+            <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" placeholder="Your First Name">
+        </div>
+
+        <div class="form-group">
+            <label for="last_name">Last Name</label>
+            <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" placeholder="Your Last Name">
+        </div>
+
+        <div class="form-group full-width">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" value="{{ user.email }}" placeholder="your.email@example.com">
+        </div>
+
+        <div class="form-group full-width">
+            <label for="phone">Phone Number</label>
+            <input type="text" id="phone" name="phone" value="{{ user.phone }}" placeholder="Your Phone Number">
+        </div>
+
+        <div class="form-group full-width">
+            <label for="username">Username (Cannot be changed)</label>
+            <input type="text" id="username" value="{{ user.username }}" disabled style="background: #f9f9f9; cursor: not-allowed;">
+        </div>
+
+        <button type="submit" class="btn-save">Save Changes</button>
+    </form>
+</div>
+{% endblock %}

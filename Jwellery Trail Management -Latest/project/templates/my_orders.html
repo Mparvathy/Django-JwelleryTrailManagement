@@ -1,0 +1,229 @@
+{% extends 'base3.html' %}
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400&family=Cinzel:wght@400;500;600&family=Jost:wght@300;400;500;600&display=swap');
+
+  :root {
+    --gold: #b8922a;
+    --gold-light: #d4aa50;
+    --ivory: #fdfaf5;
+    --text: #1a1410;
+    --border: rgba(184, 146, 42, 0.16);
+  }
+
+  .my-orders-container {
+    max-width: 1080px;
+    margin: 60px auto;
+    padding: 0 5vw;
+  }
+
+  .page-title {
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Cinzel', serif;
+    font-size: 32px;
+    letter-spacing: 2px;
+    color: var(--text);
+  }
+
+  .order-card {
+    margin-bottom: 24px;
+    border: 1px solid var(--border);
+    background: white;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+  }
+
+  .order-card-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    padding: 26px 30px;
+  }
+
+  .order-info {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(120px, 1fr));
+    gap: 24px;
+    flex: 1;
+  }
+
+  .info-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-family: 'Jost', sans-serif;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #8a7a68;
+  }
+
+  .info-group span {
+    font-family: 'Jost', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 110px;
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-family: 'Jost', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .status-pending { background: #fff5e6; color: #d68910; }
+  .status-success { background: #f0faf2; color: #2d6a3f; }
+  .status-shipped { background: #eef6fd; color: #2e86c1; }
+  .status-delivered { background: #f5f0fa; color: #7d3c98; }
+
+  .order-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    padding: 20px 30px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    background: #fffdfa;
+  }
+
+  .order-preview {
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+    color: #6f6255;
+  }
+
+  .order-action {
+    display: inline-block;
+    padding: 12px 22px;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    text-decoration: none;
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+  }
+
+  .order-action:hover {
+    background: var(--gold);
+    color: white;
+  }
+
+  .empty-state {
+    padding: 100px 20px;
+    text-align: center;
+  }
+
+  .empty-state h2 {
+    margin-bottom: 12px;
+    font-family: 'Bodoni Moda', serif;
+    color: var(--text);
+  }
+
+  .empty-state p {
+    color: #888;
+  }
+
+  .empty-state a {
+    display: inline-block;
+    margin-top: 30px;
+    color: var(--gold);
+    text-decoration: none;
+    border-bottom: 1px solid var(--gold);
+  }
+
+  @media (max-width: 900px) {
+    .order-card-main,
+    .order-card-footer {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .order-info {
+      grid-template-columns: repeat(2, minmax(120px, 1fr));
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .order-info {
+      grid-template-columns: 1fr;
+    }
+
+    .order-card-main,
+    .order-card-footer {
+      padding: 22px 20px;
+    }
+  }
+</style>
+
+<div class="my-orders-container">
+  <h1 class="page-title">My Orders</h1>
+
+  {% for order in orders %}
+  <div class="order-card">
+    <div class="order-card-main">
+      <div class="order-info">
+        <div class="info-group">
+          <label>Order Placed</label>
+          <span>{{ order.created_at|date:"d M Y" }}</span>
+        </div>
+        <div class="info-group">
+          <label>Order No</label>
+          <span>ORD-{{ order.id }}</span>
+        </div>
+        <div class="info-group">
+          <label>Total</label>
+          <span>Rs. {{ order.total_amount }}</span>
+        </div>
+        <div class="info-group">
+          <label>Items</label>
+          <span>{{ order.items.count }} item{{ order.items.count|pluralize }}</span>
+        </div>
+      </div>
+
+      <div class="status-badge status-{{ order.status|lower }}">
+        {{ order.status }}
+      </div>
+    </div>
+
+    <div class="order-card-footer">
+      <div class="order-preview">
+        {% with first_item=order.items.first %}
+          {% if first_item %}
+            {{ first_item.product.name }}{% if order.items.count > 1 %} and {{ order.items.count|add:"-1" }} more{% endif %}
+          {% else %}
+            Order summary available
+          {% endif %}
+        {% endwith %}
+        
+        {% if order.admin_comment %}
+        <div style="margin-top: 8px; font-size: 12px; color: #b8860b; display: flex; align-items: center; gap: 6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          <span>Note from Admin available</span>
+        </div>
+        {% endif %}
+      </div>
+      <a href="{% url 'order_details' order.id %}" class="order-action">View Details</a>
+    </div>
+  </div>
+  {% empty %}
+  <div class="empty-state">
+    <h2>No orders found</h2>
+    <p>You haven't placed any orders yet.</p>
+    <a href="{% url 'menu' %}">Start Shopping</a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

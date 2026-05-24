@@ -1,0 +1,82 @@
+{% extends 'base3.html' %}
+{% block content %}
+<style>
+  .success-container {
+    max-width: 600px;
+    margin: 100px auto;
+    text-align: center;
+    padding: 60px;
+    background: white;
+    border: 1px solid rgba(184,146,42,0.2);
+    position: relative;
+  }
+
+  .success-container::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: #B8922A;
+  }
+
+  .success-icon {
+    font-size: 64px;
+    color: #B8922A;
+    margin-bottom: 24px;
+  }
+
+  .success-title {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    color: #1A1410;
+    margin-bottom: 16px;
+  }
+
+  .order-id {
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+    color: #8A7A68;
+    margin-bottom: 40px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .success-details {
+    font-family: 'Bodoni Moda', serif;
+    font-size: 18px;
+    color: #1A1410;
+    margin-bottom: 40px;
+    line-height: 1.6;
+  }
+
+  .btn-dashboard {
+    display: inline-block;
+    padding: 15px 40px;
+    background: #1A1410;
+    color: #FDFAF5;
+    text-decoration: none;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    transition: all 0.3s;
+  }
+
+  .btn-dashboard:hover {
+    background: #B8922A;
+    transform: translateY(-2px);
+  }
+</style>
+
+<div class="success-container">
+  <div class="success-icon">✦</div>
+  <h1 class="success-title">Order Successful!</h1>
+  <p class="order-id">Order ID: #ORD-{{ order.id }}</p>
+  
+  <div class="success-details">
+    Thank you for your purchase, {{ order.user.first_name|default:order.user.username }}.<br>
+    Your order for <strong>₹{{ order.total_amount }}</strong> using <strong>{{ order.payment_method }}</strong> has been received and is being processed.
+  </div>
+
+  <a href="{% url 'userdashboard' %}" class="btn-dashboard">Back to Dashboard</a>
+</div>
+{% endblock %}

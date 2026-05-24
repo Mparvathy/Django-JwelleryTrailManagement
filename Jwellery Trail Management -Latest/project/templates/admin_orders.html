@@ -1,0 +1,380 @@
+{% extends 'base1.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Raleway:wght@300;400;500;600&display=swap');
+
+  :root {
+    --gold: #c9a84c;
+    --gold-dark: #b8860b;
+    --gold-light: #e8cc7a;
+    --ivory: #faf6f0;
+    --cream: #f2ebe0;
+    --white: #ffffff;
+    --text: #2c2416;
+    --muted: #7a6e60;
+    --border: rgba(201, 168, 76, 0.22);
+  }
+
+  .order-page {
+    min-height: 100vh;
+    padding: 60px 40px 80px;
+    background: var(--ivory);
+  }
+
+  .order-card {
+    position: relative;
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    border: 1px solid var(--border);
+    background: var(--white);
+    box-shadow: 0 10px 40px rgba(184, 134, 11, 0.08);
+    animation: cardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  @keyframes cardIn {
+    0% { opacity: 0; transform: translateY(16px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .order-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .order-card-header {
+    padding: 30px 36px 22px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .order-gem {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--gold);
+    font-size: 26px;
+  }
+
+  .order-card-header h2 {
+    margin-bottom: 6px;
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .order-card-header h2 span {
+    color: var(--gold);
+  }
+
+  .order-card-header p {
+    font-family: 'Raleway', sans-serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: var(--muted);
+  }
+
+  .order-card-body {
+    overflow-x: auto;
+  }
+
+  .orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Raleway', sans-serif;
+  }
+
+  .orders-table th {
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--ivory);
+    text-align: left;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text);
+    vertical-align: top;
+  }
+
+  .orders-table td {
+    padding: 20px;
+    border-bottom: 1px solid rgba(201, 168, 76, 0.1);
+    vertical-align: top;
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  .order-id {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gold-dark);
+  }
+
+  .cust-info {
+    min-width: 170px;
+  }
+
+  .cust-info small,
+  .cell-subtext {
+    display: block;
+    margin-top: 3px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .amount-text {
+    font-weight: 600;
+    color: var(--gold-dark);
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .status-pending { background: #fff5e6; color: #d68910; border-color: rgba(214, 137, 16, 0.2); }
+  .status-success { background: #f0faf2; color: #2d6a3f; border-color: rgba(45, 106, 63, 0.2); }
+  .status-shipped { background: #eef6fd; color: #2e86c1; border-color: rgba(46, 134, 193, 0.2); }
+  .status-delivered { background: #f5f0fa; color: #7d3c98; border-color: rgba(125, 60, 152, 0.2); }
+  .status-cancelled { background: #fff5f5; color: #b03030; border-color: rgba(176, 48, 48, 0.2); }
+
+  .items-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+
+  .items-list span {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .comment-text {
+    max-width: 220px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text);
+    white-space: pre-line;
+  }
+
+  .comment-empty {
+    font-size: 12px;
+    font-style: italic;
+    color: var(--muted);
+  }
+
+  .update-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 240px;
+  }
+
+  .select-wrap {
+    position: relative;
+  }
+
+  .select-wrap::after {
+    content: '▾';
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    color: var(--gold-dark);
+    font-size: 14px;
+    pointer-events: none;
+  }
+
+  .status-select {
+    width: 100%;
+    padding: 12px 40px 12px 14px;
+    border: 1px solid var(--border);
+    background: linear-gradient(180deg, #fffdfa 0%, #f8f0df 100%);
+    appearance: none;
+    outline: none;
+    cursor: pointer;
+    font-family: 'Raleway', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+  }
+
+  .status-select:focus {
+    border-color: var(--gold-dark);
+    box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.14);
+  }
+
+  .status-comment {
+    min-height: 90px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    background: #fffefb;
+    outline: none;
+    resize: vertical;
+    font-family: 'Raleway', sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .status-comment:focus {
+    border-color: var(--gold-dark);
+    box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.14);
+  }
+
+  .btn-update {
+    padding: 11px 16px;
+    border: none;
+    background: var(--text);
+    color: var(--gold);
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: all 0.25s ease;
+  }
+
+  .btn-update:hover {
+    background: var(--gold-dark);
+    color: white;
+  }
+
+  .empty-row {
+    padding: 60px;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  @media (max-width: 920px) {
+    .order-page {
+      padding: 40px 20px 60px;
+    }
+
+    .orders-table th,
+    .orders-table td {
+      padding: 16px 14px;
+    }
+  }
+</style>
+
+<div class="order-page">
+  <div class="order-card">
+    <div class="order-card-header">
+      <span class="order-gem">📋</span>
+      <h2>Order <span>Management</span></h2>
+      <p>Review and process customer orders</p>
+    </div>
+
+    <div class="order-card-body">
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Items Purchased</th>
+            <th>Payment</th>
+            <th>Grand Total</th>
+            <th>Date & Time</th>
+            <th>Status</th>
+            <th>Comment</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in orders %}
+          <tr>
+            <td><span class="order-id">#ORD-{{ order.id }}</span></td>
+            <td>
+              <div class="cust-info">
+                {{ order.user.username }}
+                <small>{{ order.user.email }}</small>
+              </div>
+            </td>
+            <td>
+              <ul class="items-list">
+                {% for item in order.items.all %}
+                <li><span>{{ item.product.name }}</span> (x{{ item.quantity }})</li>
+                {% endfor %}
+              </ul>
+            </td>
+            <td>
+              {{ order.payment_method }}
+              <span class="cell-subtext">Payment mode</span>
+            </td>
+            <td class="amount-text">Rs. {{ order.total_amount }}</td>
+            <td>
+              {{ order.created_at|date:"M d, Y" }}
+              <span class="cell-subtext">{{ order.created_at|date:"h:i A" }}</span>
+            </td>
+            <td>
+              <span class="status-badge status-{{ order.status|lower }}">
+                {{ order.status }}
+              </span>
+            </td>
+            <td>
+              {% if order.admin_comment %}
+              <div class="comment-text">{{ order.admin_comment }}</div>
+              {% else %}
+              <div class="comment-empty">No admin comment yet.</div>
+              {% endif %}
+            </td>
+            <td>
+              <form action="{% url 'update_order_status' order.id %}" method="POST" class="update-form">
+                {% csrf_token %}
+                <div class="select-wrap">
+                  <select name="status" class="status-select">
+                    <option value="Pending" {% if order.status == 'Pending' %}selected{% endif %}>1. Pending</option>
+                    <option value="Success" {% if order.status == 'Success' %}selected{% endif %}>2. Confirmed</option>
+                    <option value="Shipped" {% if order.status == 'Shipped' %}selected{% endif %}>3. Shipped</option>
+                    <option value="Delivered" {% if order.status == 'Delivered' %}selected{% endif %}>4. Delivered</option>
+                    <option value="Cancelled" {% if order.status == 'Cancelled' %}selected{% endif %}>5. Cancelled</option>
+                  </select>
+                </div>
+                <textarea
+                  name="admin_comment"
+                  class="status-comment"
+                  placeholder="Add a short order note or delivery comment..."
+                >{{ order.admin_comment }}</textarea>
+                <button type="submit" class="btn-update">Save Update</button>
+              </form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="9" class="empty-row">
+              No orders have been placed yet.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

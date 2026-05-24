@@ -1,0 +1,256 @@
+{% extends 'base3.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400&family=Jost:wght@200;300;400;500&display=swap');
+
+  :root {
+    --gold: #B8922A; --gold-light: #D4AA50; --ivory: #FDFAF5;
+    --cream: #F5EFE3; --sand: #EDE3D0; --text: #1A1410;
+    --text-mid: #4A3F32; --text-soft: #8A7A68; --border: rgba(184,146,42,0.15);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--ivory); }
+
+  /* ── page header (wishlist style) ── */
+  .wishlist-layout {
+    max-width: 1300px;
+    margin: 40px auto;
+    padding: 0 8vw;
+  }
+
+  .wishlist-header {
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 15px;
+  }
+
+  .wishlist-header h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    color: var(--text);
+    letter-spacing: 2px;
+  }
+
+  /* ── layout ── */
+  .cart-wrap {
+    padding: 20px 0 80px;
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 40px;
+    align-items: start;
+  }
+
+  /* ── items table ── */
+  .cart-items { display: flex; flex-direction: column; gap: 0; }
+
+  .cart-item {
+    display: grid;
+    grid-template-columns: 100px 1fr auto auto auto;
+    align-items: center;
+    gap: 20px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .cart-item:first-child { border-top: 1px solid var(--border); }
+
+  .cart-item-img {
+    width: 100px; height: 100px; object-fit: cover; display: block;
+    background: var(--sand);
+  }
+
+  .cart-item-name {
+    font-family: 'Bodoni Moda', serif; font-size: 16px;
+    font-weight: 400; color: var(--text); margin-bottom: 4px;
+  }
+  .cart-item-cat {
+    font-family: 'Jost', sans-serif; font-size: 10px; font-weight: 300;
+    color: var(--text-soft); letter-spacing: 2px; text-transform: uppercase;
+  }
+
+  .cart-item-price {
+    font-family: 'Jost', sans-serif; font-size: 14px;
+    font-weight: 500; color: var(--gold); letter-spacing: 1px;
+    white-space: nowrap;
+  }
+
+  /* qty form */
+  .qty-form { display: flex; align-items: center; gap: 0; }
+  .qty-btn {
+    width: 32px; height: 32px; background: var(--sand); border: 1px solid var(--border);
+    font-family: 'Jost', sans-serif; font-size: 16px; color: var(--text-mid);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .qty-btn:hover { background: var(--gold); color: #fff; border-color: var(--gold); }
+  .qty-input {
+    width: 44px; height: 32px; border: 1px solid var(--border); border-left: none; border-right: none;
+    text-align: center; font-family: 'Jost', sans-serif; font-size: 13px;
+    color: var(--text); background: var(--ivory); outline: none;
+  }
+  /* hide number arrows */
+  .qty-input::-webkit-outer-spin-button,
+  .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  /* remove btn */
+  .btn-remove {
+    background: none; border: none; cursor: pointer;
+    font-family: 'Jost', sans-serif; font-size: 10px; font-weight: 300;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--text-soft);
+    padding: 6px 0; transition: color 0.2s;
+  }
+  .btn-remove:hover { color: #c0392b; }
+
+  /* ── summary box ── */
+  .cart-summary {
+    background: var(--sand); padding: 32px 28px; position: sticky; top: 20px;
+  }
+  .summary-title {
+    font-family: 'Bodoni Moda', serif; font-size: 20px; font-weight: 400;
+    color: var(--text); letter-spacing: 1px; margin-bottom: 24px;
+    padding-bottom: 16px; border-bottom: 1px solid var(--border);
+  }
+  .summary-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 300;
+    color: var(--text-mid); letter-spacing: 0.5px; margin-bottom: 12px;
+  }
+  .summary-row.total {
+    font-size: 15px; font-weight: 500; color: var(--text);
+    border-top: 1px solid var(--border); padding-top: 16px; margin-top: 8px;
+  }
+  .summary-row.total span:last-child { color: var(--gold); font-size: 18px; }
+
+  .btn-checkout {
+    display: block; width: 100%; padding: 14px;
+    background: var(--text); color: var(--ivory);
+    font-family: 'Jost', sans-serif; font-size: 10px; font-weight: 400;
+    letter-spacing: 3px; text-transform: uppercase; text-align: center;
+    border: none; cursor: pointer; margin-top: 24px;
+    transition: background 0.25s; text-decoration: none;
+  }
+  .btn-checkout:hover { background: var(--gold); }
+
+  .btn-continue {
+    display: block; text-align: center; margin-top: 14px;
+    font-family: 'Jost', sans-serif; font-size: 10px; font-weight: 300;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--text-soft);
+    text-decoration: none; transition: color 0.2s;
+  }
+  .btn-continue:hover { color: var(--gold); }
+
+  /* ── empty state ── */
+  .cart-empty {
+    grid-column: 1 / -1; text-align: center; padding: 80px 20px;
+  }
+  .cart-empty-icon { font-size: 48px; color: var(--gold); margin-bottom: 20px; }
+  .cart-empty-title {
+    font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400;
+    color: var(--text); margin-bottom: 10px;
+  }
+  .cart-empty-sub {
+    font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 300;
+    color: var(--text-soft); letter-spacing: 1px; margin-bottom: 32px;
+  }
+  .btn-shop {
+    display: inline-block; padding: 13px 36px;
+    background: var(--text); color: var(--ivory);
+    font-family: 'Jost', sans-serif; font-size: 10px;
+    letter-spacing: 3px; text-transform: uppercase; text-decoration: none;
+    transition: background 0.25s;
+  }
+  .btn-shop:hover { background: var(--gold); }
+
+  @media (max-width: 900px) {
+    .cart-wrap { grid-template-columns: 1fr; }
+    .cart-summary { position: static; }
+  }
+  @media (max-width: 600px) {
+    .cart-item { grid-template-columns: 80px 1fr; grid-template-rows: auto auto auto; }
+    .cart-item-price { grid-column: 2; }
+    .qty-form { grid-column: 2; }
+    .btn-remove { grid-column: 2; }
+  }
+</style>
+
+<div class="wishlist-layout">
+  <div class="wishlist-header">
+    <h2>My Shopping Cart ✦</h2>
+  </div>
+  
+  <div class="cart-wrap">
+    {% if items %}
+
+  <!-- items -->
+  <div class="cart-items">
+    {% for item in items %}
+    <div class="cart-item">
+
+      <!-- image -->
+      {% if item.product.image %}
+        <img class="cart-item-img" src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+      {% else %}
+        <img class="cart-item-img" src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=300&q=80&auto=format&fit=crop" alt="{{ item.product.name }}">
+      {% endif %}
+
+      <!-- name / category -->
+      <div>
+        <div class="cart-item-name">{{ item.product.name }}</div>
+        <div class="cart-item-cat">{{ item.product.category.name }}</div>
+      </div>
+
+      <!-- unit price -->
+      <div class="cart-item-price">₹{{ item.product.price }}</div>
+
+      <!-- qty -->
+      <form method="post" action="{% url 'update_cart' item.id %}" class="qty-form">
+        {% csrf_token %}
+        <button type="submit" name="quantity" value="{{ item.quantity|add:'-1' }}" class="qty-btn">−</button>
+        <input class="qty-input" type="number" name="quantity" value="{{ item.quantity }}" min="0" max="99"
+               onchange="this.form.submit()">
+        <button type="submit" name="quantity" value="{{ item.quantity|add:'1' }}" class="qty-btn">+</button>
+      </form>
+
+      <!-- remove -->
+      <form method="post" action="{% url 'remove_from_cart' item.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-remove">✕ Remove</button>
+      </form>
+
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- summary -->
+  <div class="cart-summary">
+    <div class="summary-title">Order Summary</div>
+    <div class="summary-row">
+      <span>{{ items.count }} item{{ items.count|pluralize }}</span>
+      <span>₹{{ total }}</span>
+    </div>
+    <div class="summary-row">
+      <span>Shipping</span>
+      <span>{% if total >= 5000 %}Free{% else %}₹199{% endif %}</span>
+    </div>
+    <div class="summary-row total">
+      <span>Total</span>
+      <span>₹{% if total >= 5000 %}{{ total }}{% else %}{{ total|add:'199' }}{% endif %}</span>
+    </div>
+    <a href="{% url 'checkout' %}" class="btn-checkout">✦ &nbsp;Proceed to Checkout</a>
+    <a href="{% url 'menu' %}" class="btn-continue">← Continue Shopping</a>
+  </div>
+
+  {% else %}
+
+  <div class="cart-empty">
+    <div class="cart-empty-icon">✦</div>
+    <div class="cart-empty-title">Your cart is empty</div>
+    <div class="cart-empty-sub">Discover our fine jewelry collections and add your favourites.</div>
+    <a href="{% url 'menu' %}" class="btn-shop">Browse Collections</a>
+  </div>
+
+  {% endif %}
+</div>
+</div>
+{% endblock %}

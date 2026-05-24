@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Print Order {{ order.id }}</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 32px;
+      background: #f6f1e8;
+      color: #1a1410;
+      font-family: Georgia, serif;
+    }
+
+    .print-shell {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 36px;
+      background: #ffffff;
+      border: 1px solid #dbcba9;
+    }
+
+    .print-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .print-title {
+      font-size: 32px;
+      letter-spacing: 1px;
+    }
+
+    .print-btn {
+      padding: 10px 18px;
+      border: 1px solid #b8922a;
+      background: #ffffff;
+      color: #b8922a;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .summary-grid,
+    .detail-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .summary-grid {
+      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      margin-bottom: 28px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid #e7dcc5;
+    }
+
+    .detail-grid {
+      grid-template-columns: 2fr 1fr;
+      margin-bottom: 30px;
+    }
+
+    .label {
+      margin-bottom: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #7d6e5a;
+    }
+
+    .value,
+    .value p {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .section-title {
+      margin-bottom: 12px;
+      font-size: 22px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 12px 8px;
+      border-bottom: 1px solid #ece4d3;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th:last-child,
+    td:last-child {
+      text-align: right;
+    }
+
+    .total-row td {
+      font-weight: 700;
+      font-size: 15px;
+      border-bottom: none;
+      padding-top: 18px;
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 12px;
+      }
+
+      .print-shell {
+        padding: 20px;
+      }
+
+      .print-topbar,
+      .summary-grid,
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+
+      .print-shell {
+        max-width: none;
+        border: none;
+        padding: 0;
+      }
+
+      .print-btn {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-shell">
+    <div class="print-topbar">
+      <div class="print-title">Order Receipt</div>
+      <button class="print-btn" onclick="window.print()">Print</button>
+    </div>
+
+    <div class="summary-grid">
+      <div>
+        <div class="label">Order No</div>
+        <div class="value">ORD-{{ order.id }}</div>
+      </div>
+      <div>
+        <div class="label">Date</div>
+        <div class="value">{{ order.created_at|date:"d M Y, h:i A" }}</div>
+      </div>
+      <div>
+        <div class="label">Status</div>
+        <div class="value">{{ order.status }}</div>
+      </div>
+      <div>
+        <div class="label">Payment</div>
+        <div class="value">{{ order.payment_method }}</div>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <div>
+        <div class="section-title">Items</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Qty</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in order.items.all %}
+            <tr>
+              <td>{{ item.product.name }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>Rs. {{ item.price|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+            <tr class="total-row">
+              <td colspan="2">Grand Total</td>
+              <td>Rs. {{ order.total_amount|floatformat:2 }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <div class="section-title">Delivery Details</div>
+        <div style="margin-bottom: 16px;">
+          <div class="label">Phone Number</div>
+          <div class="value">{{ order.phone_number|default:"Not provided" }}</div>
+        </div>
+        <div>
+          <div class="label">Shipping Address</div>
+          <div class="value">
+            {% if order.shipping_address or order.city or order.state or order.pincode %}
+            <p>{{ order.shipping_address|default:"" }}</p>
+            <p>{{ order.city }}{% if order.city and order.state %}, {% endif %}{{ order.state }}</p>
+            <p>{{ order.pincode }}</p>
+            {% else %}
+            <p>Not provided</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

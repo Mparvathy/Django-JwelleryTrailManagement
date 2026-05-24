@@ -1,0 +1,228 @@
+{% extends 'base1.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Raleway:wght@300;400;500;600&display=swap');
+
+  :root {
+    --gold:      #C9A84C;
+    --gold-dark: #B8860B;
+    --gold-light:#E8CC7A;
+    --ivory:     #faf6f0;
+    --cream:     #f2ebe0;
+    --white:     #ffffff;
+    --text:      #2c2416;
+    --muted:     #7a6e60;
+    --border:    rgba(201,168,76,0.22);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .musers-page {
+    min-height: 100vh;
+    background: var(--ivory);
+    padding: 48px 40px 80px;
+  }
+
+  .musers-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .musers-header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--text);
+    letter-spacing: 3px;
+  }
+  .musers-header h1 span { color: var(--gold); }
+
+  .musers-header p {
+    font-family: 'Raleway', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 5px;
+    letter-spacing: 0.5px;
+  }
+
+  .musers-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    position: relative;
+  }
+  .musers-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .musers-toolbar {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .search-input {
+    flex: 1;
+    max-width: 320px;
+    padding: 10px 14px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--ivory);
+    border: 1px solid var(--border);
+    outline: none;
+    transition: border-color 0.25s;
+  }
+  .search-input:focus { border-color: var(--gold); }
+
+  .musers-count {
+    font-family: 'Raleway', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: auto;
+    letter-spacing: 1px;
+  }
+  .musers-count span { font-weight: 600; color: var(--gold-dark); }
+
+  .musers-table { width: 100%; border-collapse: collapse; }
+
+  .musers-table th {
+    font-family: 'Raleway', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold-dark);
+    padding: 13px 20px;
+    text-align: left;
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .musers-table td {
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(201,168,76,0.08);
+    font-family: 'Raleway', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    vertical-align: middle;
+  }
+
+  .profile-wrap { display: flex; align-items: center; gap: 12px; }
+  .profile-avatar {
+    width: 32px; height: 32px;
+    background: var(--cream);
+    color: var(--gold-dark);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .profile-info { display: flex; flex-direction: column; }
+  .profile-name { font-weight: 600; color: var(--text); }
+  .profile-handle { font-size: 11px; color: var(--muted); }
+
+  .contact-item { display: flex; align-items: center; gap: 6px; font-size: 12px; margin-bottom: 2px; }
+  .contact-icon { color: var(--gold); }
+
+  .type-badge {
+    padding: 3px 10px;
+    background: #f0faf2;
+    color: #2d6a3f;
+    border: 1px solid rgba(45,106,63,0.15);
+    border-radius: 12px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .empty-state { padding: 60px 20px; text-align: center; }
+  .empty-state p { font-family: 'Raleway', sans-serif; font-size: 14px; color: var(--muted); }
+</style>
+
+<div class="musers-page">
+    <div class="musers-header">
+        <div>
+            <h1>Registered <span>Users</span></h1>
+            <p>Managing boutique members and boutique access.</p>
+        </div>
+    </div>
+
+    <div class="musers-card">
+        <div class="musers-toolbar">
+            <input type="text" class="search-input" placeholder="Search members..." oninput="filterTable(this)"/>
+            <span class="musers-count">Total: <span>{{ users.count }}</span> members</span>
+        </div>
+
+        <table class="musers-table">
+            <thead>
+                <tr>
+                    <th>User Detail</th>
+                    <th>Contact Information</th>
+                    <th>Account Type</th>
+                    <th>Joined</th>
+                </tr>
+            </thead>
+            <tbody id="user-tbody">
+                {% for user in users %}
+                <tr>
+                    <td>
+                        <div class="profile-wrap">
+                            <div class="profile-avatar">{{ user.username|upper|slice:":1" }}</div>
+                            <div class="profile-info">
+                                <span class="profile-name">{{ user.first_name|default:user.username }}</span>
+                                <span class="profile-handle">@{{ user.username }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="contact-item">
+                            <span class="contact-icon">✉</span>
+                            <span>{{ user.email }}</span>
+                        </div>
+                        {% if user.phone %}
+                        <div class="contact-item">
+                            <span class="contact-icon">☎</span>
+                            <span>{{ user.phone }}</span>
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td><span class="type-badge">Customer</span></td>
+                    <td>{{ user.date_joined|date:"d M Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">
+                        <div class="empty-state">
+                            <p>No registered users found.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function filterTable(input) {
+        const q = input.value.toLowerCase();
+        document.querySelectorAll('#user-tbody tr').forEach(row => {
+            row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+        });
+    }
+</script>
+{% endblock %}

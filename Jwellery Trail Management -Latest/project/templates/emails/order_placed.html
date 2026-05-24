@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .email-container {
+            font-family: 'Poppins', Arial, sans-serif;
+            max-width: 640px;
+            margin: 0 auto;
+            border: 1px solid #eee;
+            background: #fff;
+        }
+        .header {
+            background: #111;
+            color: #d4af37;
+            text-align: center;
+            padding: 24px;
+            font-size: 26px;
+            letter-spacing: 4px;
+        }
+        .content {
+            padding: 28px;
+            color: #333;
+            line-height: 1.6;
+        }
+        .summary-box {
+            margin: 20px 0;
+            padding: 18px;
+            background: #faf7f1;
+            border-left: 4px solid #d4af37;
+        }
+        .item-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 18px;
+        }
+        .item-table th,
+        .item-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #ece6da;
+            text-align: left;
+        }
+        .item-table th:last-child,
+        .item-table td:last-child {
+            text-align: right;
+        }
+        .footer {
+            padding: 0 28px 28px;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">TANISHQ</div>
+        <div class="content">
+            <h3>Hello {{ user.first_name|default:user.username }},</h3>
+            <p>Your order has been placed successfully. We have received your request and will start processing it shortly.</p>
+
+            <div class="summary-box">
+                <p><strong>Order No:</strong> ORD-{{ order.id }}</p>
+                <p><strong>Order Date:</strong> {{ order.created_at|date:"d M Y, h:i A" }}</p>
+                <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+                <p><strong>Total Amount:</strong> Rs. {{ order.total_amount }}</p>
+            </div>
+
+            <h4>Items in your order</h4>
+            <table class="item-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items.all %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>Rs. {{ item.price }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <p style="margin-top: 22px;"><strong>Shipping Address</strong><br>
+                {{ order.shipping_address }}<br>
+                {{ order.city }}{% if order.city and order.state %}, {% endif %}{{ order.state }} {{ order.pincode }}<br>
+                Phone: {{ order.phone_number }}
+            </p>
+        </div>
+        <div class="footer">
+            Thank you for shopping with us.<br>
+            The Tanishq Team
+        </div>
+    </div>
+</body>
+</html>

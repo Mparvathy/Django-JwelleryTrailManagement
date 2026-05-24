@@ -1,0 +1,180 @@
+{% extends 'base3.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #f8f8f8; font-family: 'Poppins', sans-serif; }
+
+  .wishlist-layout {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+  }
+
+  .wishlist-header {
+    margin-bottom: 30px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+  }
+
+  .wishlist-header h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    color: #222;
+  }
+
+  .wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .wishlist-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .wishlist-img-wrap {
+    position: relative;
+    height: 260px;
+    background: #fafafa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .wishlist-img-wrap img {
+    width: 100%; height: 100%; object-fit: contain;
+  }
+
+  /* Wishlist Remove Button */
+  .remove-wishlist-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #e91e63;
+    font-size: 16px;
+    text-decoration: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+  }
+  .remove-wishlist-btn:hover { transform: scale(1.1); }
+
+  .wishlist-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .wishlist-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: #222;
+    margin-bottom: 8px;
+  }
+
+  .wishlist-price {
+    font-size: 16px;
+    font-weight: 600;
+    color: #B8860B;
+    margin-bottom: 16px;
+  }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+  }
+
+  .try-on-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: #f5ece4;
+    color: #8B5E3C;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+    border-radius: 0;
+  }
+  .try-on-btn:hover { background: #e8d5c4; }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #aaa;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  }
+  .empty-state h3 { font-family: 'Cinzel', serif; font-size: 24px; color: #555; margin-bottom: 10px; }
+  .empty-state p { font-size: 14px; margin-bottom: 20px; }
+  .empty-state a { color: #B8860B; text-decoration: underline; }
+
+</style>
+
+<div class="wishlist-layout">
+  <div class="wishlist-header">
+    <h2>Your Wishlist ✦</h2>
+  </div>
+
+  {% if wishlist_items %}
+  <div class="wishlist-grid">
+    {% for item in wishlist_items %}
+    <div class="wishlist-card">
+      <div class="wishlist-img-wrap">
+        {% if item.product.image %}
+          <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" />
+        {% else %}
+          <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=500&q=80" alt="{{ item.product.name }}" />
+        {% endif %}
+        
+        <a href="{% url 'toggle_wishlist' item.product.id %}" class="remove-wishlist-btn" title="Remove from Wishlist">
+          ❤️
+        </a>
+      </div>
+
+      <div class="wishlist-body">
+        <div class="wishlist-name">{{ item.product.name }}</div>
+        <div class="wishlist-price">₹{{ item.product.price }}</div>
+        
+        <div class="actions">
+          {% if item.product.stock > 0 %}
+            <form method="post" action="{% url 'add_to_cart' item.product.id %}" style="flex:1;">
+              {% csrf_token %}
+              <button type="submit" class="try-on-btn">Add to Cart</button>
+            </form>
+          {% else %}
+            <button class="try-on-btn" disabled style="background:#ccc; color:#666; cursor:not-allowed;">Out of Stock</button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <h3>Your wishlist is empty</h3>
+    <p>Love it? Add it to your wishlist to keep track of your favorite pieces.</p>
+    <a href="{% url 'menu' %}">Browse Collections</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
